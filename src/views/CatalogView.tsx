@@ -115,8 +115,8 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
         )}
       </div>
 
-      {/* Real-time Calculation Rule / Formula Box */}
-      <PriceFormulaBanner />
+      {/* Real-time Calculation Rule / Formula Box (Solo para Administradores) */}
+      {currentUser?.role === 'admin' && <PriceFormulaBanner />}
 
       {/* Filter Toolbar (Vibrant Styling) */}
       <div className="bg-white rounded-[2rem] p-5 border border-yellow-200/90 shadow-sm mb-8 space-y-4">

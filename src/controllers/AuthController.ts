@@ -4,6 +4,7 @@ import {
   createUserWithEmailAndPassword, 
   signOut, 
   onAuthStateChanged,
+  sendPasswordResetEmail,
   User as FirebaseUser 
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc, collection, getDocs } from 'firebase/firestore';
@@ -226,6 +227,29 @@ export class AuthController {
 
     localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(updatedProfile));
     return updatedProfile;
+  }
+
+  /**
+   * Send Password Reset Email using Firebase Authentication
+   */
+  static async sendPasswordReset(email: string): Promise<void> {
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail) {
+      throw new Error('Por favor ingresa tu correo electrónico.');
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, cleanEmail);
+    } catch (err: any) {
+      if (err.code === 'auth/user-not-found') {
+        throw new Error('No existe ninguna cuenta registrada con este correo electrónico.');
+      } else if (err.code === 'auth/invalid-email') {
+        throw new Error('El formato del correo electrónico ingresado no es válido.');
+      } else if (err.code === 'auth/too-many-requests') {
+        throw new Error('Demasiadas solicitudes. Por favor espera unos minutos antes de volver a intentar.');
+      }
+      throw new Error(err.message || 'Error al enviar el correo de recuperación.');
+    }
   }
 
   /**
