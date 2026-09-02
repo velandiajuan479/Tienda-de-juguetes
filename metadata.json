@@ -1,0 +1,6 @@
+{
+  "name": "ToyStore MVC - Tienda de Juguetes",
+  "description": "Aplicación web full-stack con arquitectura MVC para gestión y compra de juguetes, cálculo dinámico de precios con impuestos y descuentos, facturación y roles de usuario.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
