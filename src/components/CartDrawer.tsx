@@ -405,10 +405,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 <button
                   id="btn-proceed-to-checkout"
                   onClick={() => setIsCheckingOut(true)}
-                  className="w-full py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-black shadow-[0_4px_0_0_rgba(16,185,129,1)] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2"
+                  className="w-full py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-black shadow-[0_4px_0_0_rgba(16,185,129,1)] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <Receipt className="w-4 h-4" />
-                  <span>Proceder a Generar Factura</span>
+                  <ShoppingBag className="w-4 h-4" />
+                  <span>Comprar</span>
                 </button>
               ) : (
                 <div className="flex items-center gap-2">

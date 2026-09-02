@@ -18,7 +18,6 @@ import {
 import { Toy, Category, UserProfile, UserRole } from '../types';
 import { ToyModel } from '../models/ToyModel';
 import { UserModel } from '../models/UserModel';
-import { PriceFormulaBanner } from '../components/PriceFormulaBanner';
 
 interface CatalogViewProps {
   toys: Toy[];
@@ -114,9 +113,6 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
           </div>
         )}
       </div>
-
-      {/* Real-time Calculation Rule / Formula Box */}
-      <PriceFormulaBanner />
 
       {/* Filter Toolbar (Vibrant Styling) */}
       <div className="bg-white rounded-[2rem] p-5 border border-yellow-200/90 shadow-sm mb-8 space-y-4">
