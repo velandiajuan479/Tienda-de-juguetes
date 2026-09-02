@@ -14,10 +14,9 @@ import {
   FileCheck,
   Loader2
 } from 'lucide-react';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import { Invoice } from '../types';
 import { ToyModel } from '../models/ToyModel';
+import { generateInvoicePdf } from '../utils/generateInvoicePdf';
 
 interface InvoiceDetailModalProps {
   invoice: Invoice | null;
@@ -33,59 +32,26 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
     window.print();
   };
 
-  const handleDownloadPdf = async () => {
-    const element = document.getElementById('invoice-printable-area');
-    if (!element) return;
-
+  const handleDownloadPdf = () => {
     try {
       setIsGeneratingPdf(true);
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff',
-        windowWidth: 800,
-      });
-
-      const imgData = canvas.toDataURL('image/png', 1.0);
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4',
-      });
-
-      const pageWidth = 210;
-      const pageHeight = 297;
-      const margin = 8;
-      const availableWidth = pageWidth - margin * 2;
-      const availableHeight = pageHeight - margin * 2;
-
-      // Calculate aspect ratio
-      const imgHeight = (canvas.height * availableWidth) / canvas.width;
-
-      if (imgHeight <= availableHeight) {
-        // Fits comfortably in 1 page with margins
-        pdf.addImage(imgData, 'PNG', margin, margin, availableWidth, imgHeight, undefined, 'FAST');
-      } else {
-        // Scale to fit completely in 1 single A4 page
-        const scale = availableHeight / imgHeight;
-        const scaledWidth = availableWidth * scale;
-        const xOffset = margin + (availableWidth - scaledWidth) / 2;
-        pdf.addImage(imgData, 'PNG', xOffset, margin, scaledWidth, availableHeight, undefined, 'FAST');
-      }
-
-      pdf.save(`Factura_${invoice.invoiceNumber}.pdf`);
+      generateInvoicePdf(invoice);
     } catch (err) {
       console.error('Error generando PDF:', err);
-      window.print();
     } finally {
-      setIsGeneratingPdf(false);
+      setTimeout(() => setIsGeneratingPdf(false), 400);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-900/60 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-150 print:p-0 print:bg-white print:static print:inset-auto">
-      <div className="bg-white w-full max-w-3xl max-h-[92vh] flex flex-col rounded-3xl shadow-2xl border border-yellow-200 overflow-hidden my-auto print:shadow-none print:border-none print:m-0 print:w-full print:max-w-none print:max-h-none">
+    <div 
+      id="invoice-modal-overlay"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-900/60 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-150 print:p-0 print:bg-white print:static print:inset-auto"
+    >
+      <div 
+        id="invoice-printable-card"
+        className="bg-white w-full max-w-3xl max-h-[92vh] flex flex-col rounded-3xl shadow-2xl border border-yellow-200 overflow-hidden my-auto print:shadow-none print:border-none print:m-0 print:w-full print:max-w-none print:max-h-none"
+      >
         
         {/* Modal Action Bar (Sticky at top, hidden when printing) */}
         <div className="px-5 sm:px-6 py-4 border-b border-yellow-200 flex items-center justify-between bg-yellow-50/95 shrink-0 z-10 print:hidden">
@@ -103,17 +69,17 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
               onClick={handleDownloadPdf}
               disabled={isGeneratingPdf}
               className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black transition-all shadow-xs disabled:opacity-50 cursor-pointer"
-              title="Descargar factura en formato PDF (1 página)"
+              title="Descargar factura en formato PDF (1 página oficial)"
             >
               {isGeneratingPdf ? (
                 <>
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  <span className="hidden sm:inline">Generando PDF...</span>
+                  <span className="hidden sm:inline">Descargando...</span>
                 </>
               ) : (
                 <>
                   <Download className="w-3.5 h-3.5" />
-                  <span>Descargar PDF</span>
+                  <span>Descargar Factura PDF</span>
                 </>
               )}
             </button>

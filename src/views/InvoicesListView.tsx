@@ -17,6 +17,7 @@ import {
 import { Invoice, UserProfile, UserRole } from '../types';
 import { ToyModel } from '../models/ToyModel';
 import { InvoiceController } from '../controllers/InvoiceController';
+import { generateInvoicePdf } from '../utils/generateInvoicePdf';
 
 interface InvoicesListViewProps {
   invoices: Invoice[];
@@ -213,21 +214,30 @@ export const InvoicesListView: React.FC<InvoicesListViewProps> = ({
 
                     {/* Action */}
                     <td className="py-4 px-4 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
+                      <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => onSelectInvoice(inv)}
-                          className="px-4 py-2 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-black transition-all shadow-xs flex items-center gap-1.5"
-                          title="Ver y Descargar Factura PDF"
+                          className="px-3.5 py-2 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-black transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                          title="Ver detalle completo de la factura"
                         >
                           <Eye className="w-3.5 h-3.5" />
-                          <span>Ver / Descargar PDF</span>
+                          <span>Ver Factura</span>
+                        </button>
+
+                        <button
+                          onClick={() => generateInvoicePdf(inv)}
+                          className="px-3 py-2 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black transition-all shadow-xs flex items-center gap-1 cursor-pointer"
+                          title="Descargar Factura PDF oficial en 1 página"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>PDF</span>
                         </button>
 
                         {isStaffOrAdmin && (
                           <button
                             onClick={() => handleToggleStatus(inv.id, inv.status)}
-                            className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50"
-                            title="Cambiar estado"
+                            className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
+                            title="Cambiar estado de factura"
                           >
                             <Ban className="w-4 h-4" />
                           </button>
