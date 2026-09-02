@@ -100,7 +100,10 @@ export class AuthController {
     if (code === 'auth/invalid-email') {
       return new Error('El formato del correo electrónico ingresado no es válido.');
     }
-    if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
+    if (code === 'auth/user-not-found') {
+      return new Error('No se encontró ninguna cuenta registrada con este correo electrónico.');
+    }
+    if (code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
       return new Error('Correo o contraseña incorrectos. Revisa tus datos e intenta nuevamente.');
     }
     if (code === 'auth/too-many-requests') {

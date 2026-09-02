@@ -163,6 +163,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
           <div className="px-6 py-2.5 bg-yellow-50/50 border-b border-yellow-200 flex items-center justify-between">
             <button
               type="button"
+              id="btn-back-to-login-top"
               onClick={() => {
                 setTab('login');
                 setErrorMessage('');
@@ -256,6 +257,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
                   <div className="pt-2 flex flex-col gap-2">
                     <button
                       type="button"
+                      id="btn-reset-success-login"
                       onClick={() => {
                         setTab('login');
                         setErrorMessage('');
@@ -267,6 +269,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
                     </button>
                     <button
                       type="button"
+                      id="btn-reset-resend-email"
                       onClick={handleForgotPasswordSubmit}
                       disabled={isLoading}
                       className="text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors py-1 cursor-pointer disabled:opacity-50"
@@ -294,12 +297,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                    <label htmlFor="input-forgot-email" className="block text-xs font-bold text-slate-700 mb-1">
                       Correo Electrónico
                     </label>
                     <div className="relative">
                       <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-400" />
                       <input
+                        id="input-forgot-email"
                         type="email"
                         required
                         placeholder="usuario@toystore.com"
@@ -313,6 +317,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
 
                   <button
                     type="submit"
+                    id="btn-send-reset-password"
                     disabled={isLoading}
                     className="w-full py-3.5 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-black shadow-[0_4px_0_0_rgba(234,88,12,1)] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
@@ -329,6 +334,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
                   <div className="text-center pt-1">
                     <button
                       type="button"
+                      id="btn-back-to-login-link"
                       onClick={() => {
                         setTab('login');
                         setErrorMessage('');
