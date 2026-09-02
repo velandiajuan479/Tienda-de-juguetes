@@ -49,11 +49,11 @@ export const ToyManagementView: React.FC<ToyManagementViewProps> = ({
   const [sku, setSku] = useState('');
   const [description, setDescription] = useState('');
   const [categoryId, setCategoryId] = useState('');
-  const [basePrice, setBasePrice] = useState<number>(50);
+  const [basePrice, setBasePrice] = useState<number>(80000);
   const [taxType, setTaxType] = useState<TaxType>('IVA_GENERAL');
   const [taxRate, setTaxRate] = useState<number>(19);
   const [discountType, setDiscountType] = useState<DiscountType>('percentage');
-  const [discountValue, setDiscountValue] = useState<number>(0);
+  const [discountValue, setDiscountValue] = useState<number>(10);
   const [stock, setStock] = useState<number>(15);
   const [minAge, setMinAge] = useState<number>(4);
   const [imageUrl, setImageUrl] = useState('');
@@ -77,7 +77,7 @@ export const ToyManagementView: React.FC<ToyManagementViewProps> = ({
     setSku('TOY-' + Math.floor(1000 + Math.random() * 9000));
     setDescription('');
     setCategoryId(categories[0]?.id || '');
-    setBasePrice(45);
+    setBasePrice(80000);
     setTaxType('IVA_GENERAL');
     setTaxRate(19);
     setDiscountType('percentage');
@@ -497,14 +497,15 @@ export const ToyManagementView: React.FC<ToyManagementViewProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   {/* Base Price */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Precio Base ($) *</label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Precio Base (COP) *</label>
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
                       <input
                         id="toy-form-baseprice"
                         type="number"
-                        step="0.01"
+                        step="1000"
                         min="0"
+                        placeholder="Ej. 95000"
                         required
                         value={basePrice}
                         onChange={(e) => setBasePrice(Number(e.target.value) || 0)}
@@ -537,13 +538,14 @@ export const ToyManagementView: React.FC<ToyManagementViewProps> = ({
                   {/* Discount */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Descuento ({discountType === 'percentage' ? '%' : '$'})
+                      Descuento ({discountType === 'percentage' ? '% Porcentaje' : '$ COP Fijo'})
                     </label>
                     <div className="flex gap-1.5">
                       <input
                         type="number"
-                        step="0.01"
+                        step={discountType === 'percentage' ? '1' : '1000'}
                         min="0"
+                        placeholder={discountType === 'percentage' ? 'Ej. 15' : 'Ej. 20000'}
                         value={discountValue}
                         onChange={(e) => setDiscountValue(Number(e.target.value) || 0)}
                         className="w-full px-3 py-2 rounded-xl bg-white border border-yellow-300 text-sm font-bold text-slate-800 focus:outline-orange-500"
@@ -551,9 +553,10 @@ export const ToyManagementView: React.FC<ToyManagementViewProps> = ({
                       <button
                         type="button"
                         onClick={() => setDiscountType(discountType === 'percentage' ? 'fixed' : 'percentage')}
-                        className="px-3 py-1 bg-yellow-200 hover:bg-yellow-300 rounded-xl text-xs font-black text-orange-950"
+                        className="px-3 py-1 bg-yellow-200 hover:bg-yellow-300 rounded-xl text-xs font-black text-orange-950 whitespace-nowrap"
+                        title="Cambiar entre porcentaje (%) o valor en pesos (COP)"
                       >
-                        {discountType === 'percentage' ? '%' : '$'}
+                        {discountType === 'percentage' ? '%' : 'COP'}
                       </button>
                     </div>
                   </div>

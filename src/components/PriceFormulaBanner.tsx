@@ -4,10 +4,10 @@ import { ToyModel } from '../models/ToyModel';
 
 export const PriceFormulaBanner: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [demoBase, setDemoBase] = useState(50000);
+  const [demoBase, setDemoBase] = useState(120000);
   const [demoTaxRate, setDemoTaxRate] = useState(19);
   const [demoDiscountType, setDemoDiscountType] = useState<'percentage' | 'fixed'>('percentage');
-  const [demoDiscountValue, setDemoDiscountValue] = useState(10);
+  const [demoDiscountValue, setDemoDiscountValue] = useState(15);
 
   const breakdown = ToyModel.calculatePriceBreakdown(demoBase, demoTaxRate, demoDiscountType, demoDiscountValue);
 

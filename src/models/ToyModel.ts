@@ -1,11 +1,10 @@
 import { Toy, TaxType, DiscountType, PriceBreakdown } from '../types';
 
 export const TAX_PRESETS: { label: string; type: TaxType; rate: number }[] = [
-  { label: 'IVA General (19%)', type: 'IVA_GENERAL', rate: 19 },
-  { label: 'IVA Estándar (16%)', type: 'IVA_GENERAL', rate: 16 },
-  { label: 'IVA Reducido (10%)', type: 'IVA_REDUCIDO', rate: 10 },
-  { label: 'IVA Superreducido (4%)', type: 'IVA_SUPER_REDUCIDO', rate: 4 },
+  { label: 'IVA General Colombia (19%)', type: 'IVA_GENERAL', rate: 19 },
+  { label: 'IVA Reducido (5%)', type: 'IVA_REDUCIDO', rate: 5 },
   { label: 'Exento de Impuesto (0%)', type: 'EXENTO', rate: 0 },
+  { label: 'Impuesto al Consumo (8%)', type: 'OTRO', rate: 8 },
 ];
 
 export class ToyModel {

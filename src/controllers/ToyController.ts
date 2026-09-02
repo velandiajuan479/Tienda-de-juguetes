@@ -28,15 +28,29 @@ export class ToyController {
         const toys: Toy[] = [];
         querySnapshot.forEach((docSnap) => {
           const data = docSnap.data();
+          let basePrice = Number(data.basePrice) || 0;
+          let discountValue = Number(data.discountValue) || 0;
+          const discountType = data.discountType || 'percentage';
+
+          // Migrate any legacy small numbers to realistic Colombian Peso values
+          if (basePrice > 0 && basePrice < 1000) {
+            basePrice = Math.round(basePrice * 3500);
+            if (discountType === 'fixed' && discountValue < 500) {
+              discountValue = Math.round(discountValue * 3500);
+            }
+          }
+
           const breakdown = ToyModel.calculatePriceBreakdown(
-            data.basePrice,
-            data.taxRate,
-            data.discountType,
-            data.discountValue
+            basePrice,
+            data.taxRate ?? 19,
+            discountType,
+            discountValue
           );
           toys.push({
             id: docSnap.id,
             ...data,
+            basePrice,
+            discountValue,
             finalPrice: breakdown.finalPrice,
           } as Toy);
         });
@@ -198,11 +212,11 @@ export class ToyController {
         description: 'Set maestro de 1,450 piezas con puente levadizo, caballeros, rey y dragón articulado.',
         categoryId: catBloques.id,
         categoryName: catBloques.name,
-        basePrice: 85.0,
+        basePrice: 280000,
         taxType: 'IVA_GENERAL',
         taxRate: 19,
         discountType: 'percentage',
-        discountValue: 15, // 15% discount
+        discountValue: 15, // 15% de descuento
         stock: 14,
         minAge: 8,
         imageUrl: 'https://images.unsplash.com/photo-1585366119957-e9730b6d0f60?w=600&auto=format&fit=crop&q=80',
@@ -215,11 +229,11 @@ export class ToyController {
         description: 'Auto a control remoto de alta velocidad 35km/h con suspensión de aluminio y batería recargable.',
         categoryId: catAutos.id,
         categoryName: catAutos.name,
-        basePrice: 55.0,
+        basePrice: 160000,
         taxType: 'IVA_GENERAL',
         taxRate: 19,
         discountType: 'fixed',
-        discountValue: 10, // $10 discount
+        discountValue: 20000, // $20.000 COP de descuento
         stock: 22,
         minAge: 6,
         imageUrl: 'https://images.unsplash.com/photo-1594787318286-3d835c1d207f?w=600&auto=format&fit=crop&q=80',
@@ -232,11 +246,11 @@ export class ToyController {
         description: 'Peluche ultra suave hipoalergénico con moño satinado, ideal para abrazar y decorar habitaciones.',
         categoryId: catPeluches.id,
         categoryName: catPeluches.name,
-        basePrice: 38.0,
-        taxType: 'IVA_REDUCIDO',
-        taxRate: 10,
+        basePrice: 95000,
+        taxType: 'IVA_GENERAL',
+        taxRate: 19,
         discountType: 'percentage',
-        discountValue: 0,
+        discountValue: 10, // 10% de descuento
         stock: 35,
         minAge: 1,
         imageUrl: 'https://images.unsplash.com/photo-1559454403-b8fb88521f11?w=600&auto=format&fit=crop&q=80',
@@ -249,11 +263,11 @@ export class ToyController {
         description: 'Juego de mesa interactivo para 2 a 6 jugadores con miniaturas 3D, cartas de misión y tablero modular.',
         categoryId: catMesa.id,
         categoryName: catMesa.name,
-        basePrice: 42.0,
+        basePrice: 120000,
         taxType: 'IVA_GENERAL',
         taxRate: 19,
         discountType: 'percentage',
-        discountValue: 20, // 20% discount
+        discountValue: 20, // 20% de descuento
         stock: 18,
         minAge: 10,
         imageUrl: 'https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=600&auto=format&fit=crop&q=80',
@@ -266,11 +280,11 @@ export class ToyController {
         description: 'Kit científico STEM que permite construir 12 robots diferentes propulsados por panel solar real.',
         categoryId: catStem.id,
         categoryName: catStem.name,
-        basePrice: 49.9,
-        taxType: 'IVA_SUPER_REDUCIDO',
-        taxRate: 4,
+        basePrice: 145000,
+        taxType: 'IVA_REDUCIDO',
+        taxRate: 5,
         discountType: 'fixed',
-        discountValue: 5,
+        discountValue: 15000, // $15.000 COP de descuento
         stock: 25,
         minAge: 8,
         imageUrl: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&auto=format&fit=crop&q=80',
@@ -283,7 +297,7 @@ export class ToyController {
         description: 'Figura de dinosaurio con sonidos reales, mandíbula animada, ojos LED y sensor de movimiento táctil.',
         categoryId: catHero.id,
         categoryName: catHero.name,
-        basePrice: 34.5,
+        basePrice: 89000,
         taxType: 'IVA_GENERAL',
         taxRate: 19,
         discountType: 'percentage',
