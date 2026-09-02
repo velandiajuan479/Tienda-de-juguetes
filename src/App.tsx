@@ -27,7 +27,6 @@ import { InvoicesListView } from './views/InvoicesListView';
 import { UserManagementView } from './views/UserManagementView';
 import { CartDrawer } from './components/CartDrawer';
 import { InvoiceDetailModal } from './components/InvoiceDetailModal';
-import { OrderSuccessModal } from './components/OrderSuccessModal';
 import { AuthModal } from './components/AuthModal';
 import { ProfileModal } from './components/ProfileModal';
 
@@ -55,7 +54,6 @@ export default function App() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
-  const [celebrationInvoice, setCelebrationInvoice] = useState<Invoice | null>(null);
   const [editingToyItem, setEditingToyItem] = useState<Toy | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -271,23 +269,12 @@ export default function App() {
         onClearCart={handleClearCart}
         currentUser={currentUser}
         onInvoiceCreated={(invoice) => {
-          setCelebrationInvoice(invoice);
-          showToast('¡Compra realizada con éxito! 🎉');
+          setSelectedInvoice(invoice);
           refreshAllData();
         }}
         onOpenAuth={() => {
           setIsCartOpen(false);
           setIsAuthOpen(true);
-        }}
-      />
-
-      {/* Celebration & Festive Order Success Modal */}
-      <OrderSuccessModal
-        invoice={celebrationInvoice}
-        onClose={() => setCelebrationInvoice(null)}
-        onViewInvoice={(invoice) => {
-          setSelectedInvoice(invoice);
-          setCelebrationInvoice(null);
         }}
       />
 
