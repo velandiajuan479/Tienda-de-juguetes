@@ -14,8 +14,8 @@
     overflow: visible !important;
   }
 
-  /* Hide navigation, background app views and non-printable elements */
-  nav, footer, main, .print\:hidden, [data-no-print="true"] {
+  /* Hide navigation, headers, footers, background app views and non-printable elements */
+  header, nav, footer, main, aside, .print\:hidden, [data-no-print="true"] {
     display: none !important;
     visibility: hidden !important;
   }
