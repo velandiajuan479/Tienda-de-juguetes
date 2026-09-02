@@ -50,19 +50,16 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Logo & Brand (Vibrant Theme Rotated Badge) */}
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => setCurrentView('catalog')}>
             <div className="w-11 h-11 sm:w-12 sm:h-12 bg-white rounded-2xl flex items-center justify-center rotate-3 shadow-md hover:rotate-6 transition-transform">
-              <span className="text-2xl font-black text-orange-500 font-display">T!</span>
+              <span className="text-2xl font-black text-orange-500 font-display">🧸</span>
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xl sm:text-2xl font-black tracking-tight text-white font-display">
-                  TOYBOX <span className="font-light text-orange-100">MVC</span>
-                </span>
-                <span className="text-[10px] uppercase font-black tracking-widest px-2 py-0.5 rounded-full bg-white/20 text-white backdrop-blur-xs">
-                  COLOMBIA (COP)
+                  ToyStore <span className="font-extrabold text-amber-200">Kids</span>
                 </span>
               </div>
               <p className="text-[11px] text-orange-100 font-medium hidden sm:block">
-                Tienda de Juguetes & Facturación
+                Tienda de Juguetes & Diversión
               </p>
             </div>
           </div>

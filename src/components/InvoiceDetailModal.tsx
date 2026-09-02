@@ -142,7 +142,7 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
                   <Sparkles className="w-6 h-6" />
                 </div>
                 <span className="text-2xl font-black text-slate-900 font-display">
-                  Toy<span className="text-orange-500">Store</span> MVC
+                  Toy<span className="text-orange-500">Store</span> Kids
                 </span>
               </div>
               <p className="text-xs text-slate-600 font-medium pt-1">
@@ -286,9 +286,9 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
           {/* Footer stamp */}
           <div className="text-center pt-8 border-t border-slate-100 text-[10px] text-slate-400 space-y-1">
             <p className="font-bold uppercase tracking-widest text-slate-500">
-              ¡Gracias por tu compra en ToyStore MVC!
+              ¡Gracias por tu compra en ToyStore Kids!
             </p>
-            <p>Facturación automatizada con cálculo de precios, impuestos y descuentos en arquitectura MVC · Moneda: COP</p>
+            <p>Facturación electrónica oficial con cálculo automático de impuestos y descuentos · Moneda: COP</p>
           </div>
         </div>
       </div>

@@ -304,26 +304,26 @@ export default function App() {
         onSignOut={handleSignOut}
       />
 
-      {/* Footer (Vibrant Theme Warm Container) */}
+      {/* Footer */}
       <footer className="bg-white/80 backdrop-blur-sm border-t border-yellow-200 py-8 px-4 sm:px-6 lg:px-8 mt-16 print:hidden">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-600">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-xl bg-orange-500 flex items-center justify-center text-white font-black rotate-3 shadow-xs">
-              <span className="text-xs">T!</span>
+              <span className="text-xs">🧸</span>
             </div>
-            <span className="font-black text-slate-900 font-display">TOYBOX MVC</span>
-            <span className="text-slate-400">— Arquitectura Model-View-Controller</span>
+            <span className="font-black text-slate-900 font-display">ToyStore Kids</span>
+            <span className="text-slate-400">· Tienda de Juguetes</span>
           </div>
 
-          <div className="flex items-center gap-2 text-[11px] bg-yellow-100/70 border border-yellow-300/60 px-3 py-1.5 rounded-full">
-            <span className="font-bold text-orange-900">Fórmula de Precios:</span>
-            <span className="font-mono font-bold text-orange-950">
-              Base + (Base × Impuesto%) - Descuento = Final (COP)
+          <div className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+            <span>Desarrollado por</span>
+            <span className="font-black text-orange-600 bg-orange-50 px-2.5 py-1 rounded-full border border-orange-200">
+              Juan Velandia
             </span>
           </div>
 
           <div className="text-[11px] font-medium text-slate-500">
-            Roles: Cliente · Empleado · Admin | Firebase Firestore
+            © {new Date().getFullYear()} ToyStore Kids · Todos los derechos reservados
           </div>
         </div>
       </footer>
