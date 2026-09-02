@@ -14,11 +14,13 @@ import {
   ChevronDown,
   ArrowLeft,
   CheckCircle2,
-  Send
+  Send,
+  ExternalLink
 } from 'lucide-react';
 import { AuthController } from '../controllers/AuthController';
 import { UserRole, UserProfile } from '../types';
 import { ROLE_PASSWORDS } from '../models/UserModel';
+import firebaseConfig from '../../firebase-applet-config.json';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -180,10 +182,53 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
         {/* Form Body */}
         <div className="p-6 space-y-4 overflow-y-auto flex-1">
           {errorMessage && (
-            <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{errorMessage}</span>
-            </div>
+            errorMessage.includes('operation-not-allowed') ? (
+              <div className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 text-slate-800 text-xs space-y-3 animate-in fade-in duration-200">
+                <div className="flex items-start gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-amber-200/80 text-amber-900 flex items-center justify-center shrink-0 mt-0.5">
+                    <AlertCircle className="w-4 h-4 text-amber-700" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-black text-amber-950 font-display">
+                      Método "Correo y Contraseña" pendiente de habilitar
+                    </h4>
+                    <p className="text-[11px] text-amber-900/90 mt-0.5 leading-relaxed">
+                      En Firebase Authentication, el registro con correo viene desactivado por defecto para nuevos proyectos. Solo necesitas activarlo una vez en tu consola:
+                    </p>
+                  </div>
+                </div>
+
+                <ol className="list-decimal list-inside space-y-1 text-[11px] font-semibold text-slate-700 bg-white/80 p-3 rounded-xl border border-amber-200/80 leading-relaxed">
+                  <li>Abre la pestaña <strong>Sign-in method</strong> en la consola de Firebase.</li>
+                  <li>Selecciona el proveedor <strong>Correo electrónico/contraseña</strong>.</li>
+                  <li>Activa el interruptor <strong>Habilitar</strong> y haz clic en <strong>Guardar</strong>.</li>
+                </ol>
+
+                <div className="pt-1 flex flex-col sm:flex-row gap-2">
+                  <a
+                    href={`https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/providers`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex-1 py-2 px-3 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-[11px] font-black flex items-center justify-center gap-1.5 shadow-xs transition-colors"
+                  >
+                    <span>Ir a Firebase Console</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                  <button
+                    type="button"
+                    onClick={handleGoogleLogin}
+                    className="py-2 px-3 rounded-xl bg-white hover:bg-amber-100 border border-amber-300 text-slate-800 text-[11px] font-bold transition-colors"
+                  >
+                    Usar Google mientras tanto
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{errorMessage}</span>
+              </div>
+            )
           )}
 
           {tab === 'forgot' ? (

@@ -80,63 +80,110 @@ export class AuthController {
   }
 
   /**
+   * Translates Firebase auth errors into actionable user-friendly messages
+   */
+  public static formatAuthError(err: any): Error {
+    const code = err?.code || '';
+    const message = err?.message || '';
+
+    if (code === 'auth/operation-not-allowed' || message.includes('auth/operation-not-allowed') || message.includes('operation-not-allowed')) {
+      return new Error(
+        'auth/operation-not-allowed: El método "Correo electrónico y contraseña" no está habilitado aún en la consola de Firebase. Debes activarlo en Firebase Console > Authentication > Sign-in method.'
+      );
+    }
+    if (code === 'auth/email-already-in-use') {
+      return new Error('Este correo electrónico ya está registrado. Inicia sesión o utiliza la opción "¿Olvidó su contraseña?".');
+    }
+    if (code === 'auth/weak-password') {
+      return new Error('La contraseña es demasiado corta o débil. Debe contener al menos 6 caracteres.');
+    }
+    if (code === 'auth/invalid-email') {
+      return new Error('El formato del correo electrónico ingresado no es válido.');
+    }
+    if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
+      return new Error('Correo o contraseña incorrectos. Revisa tus datos e intenta nuevamente.');
+    }
+    if (code === 'auth/too-many-requests') {
+      return new Error('Demasiados intentos fallidos seguidos. Por seguridad, espera unos minutos antes de intentar de nuevo.');
+    }
+    if (code === 'auth/popup-closed-by-user') {
+      return new Error('Se cerró la ventana emergente de Google antes de completar la autenticación.');
+    }
+    if (code === 'auth/popup-blocked') {
+      return new Error('El navegador bloqueó la ventana emergente de autenticación. Permite las ventanas emergentes e inténtalo otra vez.');
+    }
+    if (code === 'auth/network-request-failed') {
+      return new Error('Error de conexión con los servidores de Firebase. Verifica tu conexión a internet.');
+    }
+    return new Error(err?.message || 'Error durante la autenticación.');
+  }
+
+  /**
    * Google Sign-in with Firebase Auth (Always defaults to 'cliente' role)
    */
   static async signInWithGoogle(): Promise<UserProfile> {
-    const result = await signInWithPopup(auth, googleProvider);
-    const fbUser = result.user;
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const fbUser = result.user;
 
-    const userDocRef = doc(db, USERS_COLLECTION, fbUser.uid);
-    const userDocSnap = await getDoc(userDocRef);
+      const userDocRef = doc(db, USERS_COLLECTION, fbUser.uid);
+      const userDocSnap = await getDoc(userDocRef);
 
-    let profile: UserProfile;
-    if (userDocSnap.exists()) {
-      profile = userDocSnap.data() as UserProfile;
-    } else {
-      profile = {
-        id: fbUser.uid,
-        uid: fbUser.uid,
-        email: fbUser.email || '',
-        displayName: fbUser.displayName || 'Cliente',
-        role: 'cliente', // Strictly default to cliente
-        photoURL: fbUser.photoURL || undefined,
-        createdAt: new Date().toISOString(),
-        lastLogin: new Date().toISOString(),
-      };
-      await setDoc(userDocRef, profile);
+      let profile: UserProfile;
+      if (userDocSnap.exists()) {
+        profile = userDocSnap.data() as UserProfile;
+      } else {
+        profile = {
+          id: fbUser.uid,
+          uid: fbUser.uid,
+          email: fbUser.email || '',
+          displayName: fbUser.displayName || 'Cliente',
+          role: 'cliente', // Strictly default to cliente
+          photoURL: fbUser.photoURL || undefined,
+          createdAt: new Date().toISOString(),
+          lastLogin: new Date().toISOString(),
+        };
+        await setDoc(userDocRef, profile);
+      }
+
+      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(profile));
+      return profile;
+    } catch (err: any) {
+      throw this.formatAuthError(err);
     }
-
-    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(profile));
-    return profile;
   }
 
   /**
    * Sign in with Email and Password
    */
   static async signInWithEmail(email: string, pass: string): Promise<UserProfile> {
-    const result = await signInWithEmailAndPassword(auth, email, pass);
-    const fbUser = result.user;
+    try {
+      const result = await signInWithEmailAndPassword(auth, email.trim(), pass);
+      const fbUser = result.user;
 
-    const userDocRef = doc(db, USERS_COLLECTION, fbUser.uid);
-    const userDocSnap = await getDoc(userDocRef);
+      const userDocRef = doc(db, USERS_COLLECTION, fbUser.uid);
+      const userDocSnap = await getDoc(userDocRef);
 
-    let profile: UserProfile;
-    if (userDocSnap.exists()) {
-      profile = userDocSnap.data() as UserProfile;
-    } else {
-      profile = {
-        id: fbUser.uid,
-        uid: fbUser.uid,
-        email: fbUser.email || email,
-        displayName: fbUser.displayName || email.split('@')[0],
-        role: 'cliente',
-        createdAt: new Date().toISOString(),
-      };
-      await setDoc(userDocRef, profile);
+      let profile: UserProfile;
+      if (userDocSnap.exists()) {
+        profile = userDocSnap.data() as UserProfile;
+      } else {
+        profile = {
+          id: fbUser.uid,
+          uid: fbUser.uid,
+          email: fbUser.email || email,
+          displayName: fbUser.displayName || email.split('@')[0],
+          role: 'cliente',
+          createdAt: new Date().toISOString(),
+        };
+        await setDoc(userDocRef, profile);
+      }
+
+      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(profile));
+      return profile;
+    } catch (err: any) {
+      throw this.formatAuthError(err);
     }
-
-    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(profile));
-    return profile;
   }
 
   /**
@@ -151,17 +198,7 @@ export class AuthController {
     try {
       await sendPasswordResetEmail(auth, cleanEmail);
     } catch (err: any) {
-      const code = err?.code || '';
-      if (code === 'auth/invalid-email') {
-        throw new Error('El formato del correo electrónico no es válido.');
-      } else if (code === 'auth/user-not-found') {
-        throw new Error('No existe ninguna cuenta registrada con este correo electrónico.');
-      } else if (code === 'auth/too-many-requests') {
-        throw new Error('Demasiadas solicitudes. Por favor espera unos minutos antes de intentar de nuevo.');
-      } else if (code === 'auth/network-request-failed') {
-        throw new Error('Error de conexión. Revisa tu acceso a internet y vuelve a intentarlo.');
-      }
-      throw new Error(err?.message || 'No se pudo enviar el correo de recuperación. Inténtalo de nuevo.');
+      throw this.formatAuthError(err);
     }
   }
 
@@ -187,27 +224,31 @@ export class AuthController {
       finalRole = requestedRole;
     }
 
-    const result = await createUserWithEmailAndPassword(auth, email, pass);
-    const fbUser = result.user;
-
-    const profile: UserProfile = {
-      id: fbUser.uid,
-      uid: fbUser.uid,
-      email: email.toLowerCase().trim(),
-      displayName: displayName.trim() || email.split('@')[0],
-      role: finalRole,
-      createdAt: new Date().toISOString(),
-      lastLogin: new Date().toISOString(),
-    };
-
     try {
-      await setDoc(doc(db, USERS_COLLECTION, fbUser.uid), profile);
-    } catch (e) {
-      console.warn('Could not save new user to firestore:', e);
-    }
+      const result = await createUserWithEmailAndPassword(auth, email.trim(), pass);
+      const fbUser = result.user;
 
-    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(profile));
-    return profile;
+      const profile: UserProfile = {
+        id: fbUser.uid,
+        uid: fbUser.uid,
+        email: email.toLowerCase().trim(),
+        displayName: displayName.trim() || email.split('@')[0],
+        role: finalRole,
+        createdAt: new Date().toISOString(),
+        lastLogin: new Date().toISOString(),
+      };
+
+      try {
+        await setDoc(doc(db, USERS_COLLECTION, fbUser.uid), profile);
+      } catch (e) {
+        console.warn('Could not save new user to firestore:', e);
+      }
+
+      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(profile));
+      return profile;
+    } catch (err: any) {
+      throw this.formatAuthError(err);
+    }
   }
 
   /**
