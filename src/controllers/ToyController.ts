@@ -17,15 +17,15 @@ const LOCAL_STORAGE_KEY = 'toystore_toys_backup';
 
 export class ToyController {
   /**
-   * Retrieves all toys from Firestore or local fallback
+   * Retrieves all toys from Firestore or local fallback (with merging to prevent data loss)
    */
   static async getToys(categories: Category[] = []): Promise<Toy[]> {
     try {
       const q = query(collection(db, COLLECTION_NAME));
       const querySnapshot = await getDocs(q);
 
+      const firestoreToys: Toy[] = [];
       if (!querySnapshot.empty) {
-        const toys: Toy[] = [];
         querySnapshot.forEach((docSnap) => {
           const data = docSnap.data();
           let basePrice = Number(data.basePrice) || 0;
@@ -46,7 +46,7 @@ export class ToyController {
             discountType,
             discountValue
           );
-          toys.push({
+          firestoreToys.push({
             id: docSnap.id,
             ...data,
             basePrice,
@@ -54,21 +54,33 @@ export class ToyController {
             finalPrice: breakdown.finalPrice,
           } as Toy);
         });
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(toys));
-        return toys;
       }
 
-      // If empty, seed initial toys
+      // Merge with locally cached toys so newly added or offline toys are never lost
+      const localToys = await this.getCachedToys();
+      const mergedMap = new Map<string, Toy>();
+
+      firestoreToys.forEach((toy) => mergedMap.set(toy.id, toy));
+      localToys.forEach((toy) => {
+        if (!mergedMap.has(toy.id)) {
+          mergedMap.set(toy.id, toy);
+        }
+      });
+
+      const mergedToys = Array.from(mergedMap.values());
+
+      if (mergedToys.length > 0) {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(mergedToys));
+        return mergedToys;
+      }
+
+      // If empty in both remote and local, seed initial toys
       return await this.seedInitialToys(categories);
     } catch (error) {
       console.warn('Firestore toys fetch warning, using fallback cache:', error);
-      const cached = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (cached) {
-        try {
-          return JSON.parse(cached);
-        } catch {
-          // parse error
-        }
+      const cached = await this.getCachedToys();
+      if (cached.length > 0) {
+        return cached;
       }
       return await this.seedInitialToys(categories);
     }
@@ -101,8 +113,15 @@ export class ToyController {
       createdAt: new Date().toISOString(),
     };
 
+    // Update local cache immediately so the UI reflects the new toy instantly
+    const existing = await this.getCachedToys();
+    const updated = [fullToy, ...existing.filter((t) => t.id !== newId)];
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
+
+    // Persist to Firestore
     try {
       await setDoc(doc(db, COLLECTION_NAME, newId), {
+        id: newId,
         ...toyData,
         sku,
         finalPrice: breakdown.finalPrice,
@@ -111,11 +130,6 @@ export class ToyController {
     } catch (err) {
       console.warn('Firestore createToy fallback:', err);
     }
-
-    // Update local cache
-    const existing = await this.getCachedToys();
-    const updated = [fullToy, ...existing];
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
 
     return fullToy;
   }
@@ -329,6 +343,7 @@ export class ToyController {
 
       try {
         await setDoc(doc(db, COLLECTION_NAME, newId), {
+          id: newId,
           ...item,
           finalPrice: breakdown.finalPrice,
         });

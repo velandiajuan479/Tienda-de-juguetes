@@ -50,6 +50,8 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
 
   // Filter and sort toys
   const filteredToys = useMemo(() => {
+    const selectedCatObj = categories.find((c) => c.id === selectedCategory);
+
     return toys
       .filter((toy) => {
         const matchesSearch =
@@ -58,10 +60,12 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
           toy.sku?.toLowerCase().includes(searchQuery.toLowerCase()) ||
           toy.categoryName?.toLowerCase().includes(searchQuery.toLowerCase());
 
-        const matchesCategory = selectedCategory === 'all' || toy.categoryId === selectedCategory;
-        const matchesPrice = toy.finalPrice <= maxPrice;
+        const matchesCategory =
+          selectedCategory === 'all' ||
+          toy.categoryId === selectedCategory ||
+          (selectedCatObj && Boolean(toy.categoryName) && toy.categoryName.trim().toLowerCase() === selectedCatObj.name.trim().toLowerCase());
 
-        return matchesSearch && matchesCategory && matchesPrice;
+        return matchesSearch && matchesCategory;
       })
       .sort((a, b) => {
         if (sortBy === 'price-asc') return a.finalPrice - b.finalPrice;
@@ -74,7 +78,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
         if (sortBy === 'name') return a.name.localeCompare(b.name);
         return (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0);
       });
-  }, [toys, searchQuery, selectedCategory, maxPrice, sortBy]);
+  }, [toys, categories, searchQuery, selectedCategory, sortBy]);
 
 
   const handleAdd = (toy: Toy) => {
@@ -175,7 +179,11 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
             Todas ({toys.length})
           </button>
           {categories.map((cat) => {
-            const count = toys.filter((t) => t.categoryId === cat.id).length;
+            const count = toys.filter(
+              (t) =>
+                t.categoryId === cat.id ||
+                (Boolean(t.categoryName) && Boolean(cat.name) && t.categoryName.trim().toLowerCase() === cat.name.trim().toLowerCase())
+            ).length;
             const isSelected = selectedCategory === cat.id;
             return (
               <button

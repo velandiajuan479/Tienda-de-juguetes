@@ -19,33 +19,47 @@ const LOCAL_STORAGE_KEY = 'toystore_categories_backup';
 
 export class CategoryController {
   /**
-   * Retrieves all categories from Firestore (with local fallback)
+   * Retrieves all categories from Firestore (with local fallback and merge)
    */
   static async getCategories(): Promise<Category[]> {
     try {
       const q = query(collection(db, COLLECTION_NAME));
       const querySnapshot = await getDocs(q);
       
+      const firestoreCategories: Category[] = [];
       if (!querySnapshot.empty) {
-        const categories: Category[] = [];
         querySnapshot.forEach((docSnap) => {
-          categories.push({ id: docSnap.id, ...docSnap.data() } as Category);
+          firestoreCategories.push({ id: docSnap.id, ...docSnap.data() } as Category);
         });
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(categories));
-        return categories;
+      }
+
+      // Merge with locally cached categories so offline or locally added categories are never erased
+      const localCategories = await this.getCachedCategories();
+      const mergedMap = new Map<string, Category>();
+
+      // Put firestore categories first
+      firestoreCategories.forEach((cat) => mergedMap.set(cat.id, cat));
+      // Preserve any local categories not yet in firestore
+      localCategories.forEach((cat) => {
+        if (!mergedMap.has(cat.id)) {
+          mergedMap.set(cat.id, cat);
+        }
+      });
+
+      const mergedCategories = Array.from(mergedMap.values());
+
+      if (mergedCategories.length > 0) {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(mergedCategories));
+        return mergedCategories;
       }
       
-      // If empty in DB, let's seed defaults
+      // If empty in both DB and local, let's seed defaults
       return await this.seedDefaultCategories();
     } catch (error) {
       console.warn('Firestore categories fetch warning, falling back to local store:', error);
-      const cached = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (cached) {
-        try {
-          return JSON.parse(cached);
-        } catch {
-          // parse error
-        }
+      const cached = await this.getCachedCategories();
+      if (cached.length > 0) {
+        return cached;
       }
       return await this.seedDefaultCategories();
     }
@@ -68,6 +82,7 @@ export class CategoryController {
 
       try {
         await setDoc(doc(db, COLLECTION_NAME, newId), {
+          id: newId,
           ...cat,
           createdAt: new Date().toISOString(),
         });
@@ -96,19 +111,21 @@ export class CategoryController {
       createdAt: new Date().toISOString(),
     };
 
+    // Update local cache immediately
+    const existing = await this.getCachedCategories();
+    const updated = [...existing.filter((c) => c.id !== newId), newCategory];
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
+
+    // Persist to Firestore
     try {
       await setDoc(doc(db, COLLECTION_NAME, newId), {
+        id: newId,
         ...categoryData,
         createdAt: newCategory.createdAt,
       });
     } catch (err) {
       console.warn('Firestore createCategory fallback:', err);
     }
-
-    // Update local cache
-    const existing = await this.getCachedCategories();
-    const updated = [...existing, newCategory];
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
 
     return newCategory;
   }

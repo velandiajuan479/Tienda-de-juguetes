@@ -118,14 +118,15 @@ export const ToyManagementView: React.FC<ToyManagementViewProps> = ({
     setErrorMessage('');
 
     try {
-      const selectedCat = categories.find((c) => c.id === categoryId);
-      const categoryName = selectedCat?.name || 'General';
+      const selectedCat = categories.find((c) => c.id === categoryId || c.name.toLowerCase() === categoryId.toLowerCase());
+      const categoryName = selectedCat?.name || (categories.length > 0 ? categories[0].name : 'General');
+      const resolvedCategoryId = selectedCat?.id || categoryId;
 
       const toyPayload = {
         name,
         sku,
         description,
-        categoryId,
+        categoryId: resolvedCategoryId,
         categoryName,
         basePrice: Number(basePrice) || 0,
         taxType,
@@ -163,15 +164,19 @@ export const ToyManagementView: React.FC<ToyManagementViewProps> = ({
   };
 
   const filteredToys = useMemo(() => {
+    const selectedFilterCat = categories.find((c) => c.id === selectedCategoryFilter);
     return toys.filter((toy) => {
       const matchesSearch =
         toy.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         toy.sku?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         toy.categoryName?.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCat = selectedCategoryFilter === 'all' || toy.categoryId === selectedCategoryFilter;
+      const matchesCat =
+        selectedCategoryFilter === 'all' ||
+        toy.categoryId === selectedCategoryFilter ||
+        (selectedFilterCat && Boolean(toy.categoryName) && toy.categoryName.trim().toLowerCase() === selectedFilterCat.name.trim().toLowerCase());
       return matchesSearch && matchesCat;
     });
-  }, [toys, searchQuery, selectedCategoryFilter]);
+  }, [toys, categories, searchQuery, selectedCategoryFilter]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
