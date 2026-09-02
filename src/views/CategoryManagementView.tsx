@@ -7,16 +7,13 @@ import {
   Check, 
   X, 
   Sparkles, 
-  Boxes, 
-  Heart, 
-  Dice5, 
-  Car, 
-  Zap, 
   RotateCcw,
   Palette
 } from 'lucide-react';
 import { Category, Toy, UserProfile } from '../types';
 import { CategoryController } from '../controllers/CategoryController';
+import { CategoryIcon } from '../components/CategoryIcon';
+import { CategoryIconPicker } from '../components/CategoryIconPicker';
 
 interface CategoryManagementViewProps {
   categories: Category[];
@@ -24,16 +21,6 @@ interface CategoryManagementViewProps {
   currentUser: UserProfile | null;
   onRefreshData: () => Promise<void>;
 }
-
-const AVAILABLE_ICONS = [
-  { label: 'Bloques', value: 'Boxes', icon: Boxes },
-  { label: 'Corazón / Peluche', value: 'Heart', icon: Heart },
-  { label: 'Juego de Mesa', value: 'Dice5', icon: Dice5 },
-  { label: 'Vehículos', value: 'Car', icon: Car },
-  { label: 'Héroes / Rayo', value: 'Zap', icon: Zap },
-  { label: 'STEM / Magia', value: 'Sparkles', icon: Sparkles },
-  { label: 'General / Capas', value: 'Layers', icon: Layers },
-];
 
 const PRESET_COLORS = [
   '#f59e0b', // Amber
@@ -113,9 +100,7 @@ export const CategoryManagementView: React.FC<CategoryManagementViewProps> = ({
   };
 
   const renderCategoryIcon = (iconName: string, iconColor: string) => {
-    const item = AVAILABLE_ICONS.find((i) => i.value === iconName) || AVAILABLE_ICONS[0];
-    const IconComp = item.icon;
-    return <IconComp className="w-5 h-5" style={{ color: iconColor }} />;
+    return <CategoryIcon name={iconName} color={iconColor} className="w-6 h-6" />;
   };
 
   return (
@@ -204,8 +189,8 @@ export const CategoryManagementView: React.FC<CategoryManagementViewProps> = ({
       {/* Category Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white w-full max-w-lg rounded-[2rem] shadow-2xl border border-yellow-200 overflow-hidden">
-            <div className="px-6 py-4 border-b border-yellow-200 flex items-center justify-between bg-yellow-50/70">
+          <div className="bg-white w-full max-w-2xl max-h-[92vh] flex flex-col rounded-[2rem] shadow-2xl border border-yellow-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-yellow-200 flex items-center justify-between bg-yellow-50/70 shrink-0">
               <h3 className="text-base font-black text-slate-900 font-display">
                 {editingId ? 'Editar Categoría' : 'Crear Nueva Categoría'}
               </h3>
@@ -214,7 +199,7 @@ export const CategoryManagementView: React.FC<CategoryManagementViewProps> = ({
               </button>
             </div>
 
-            <form onSubmit={handleSave} className="p-6 space-y-4">
+            <form onSubmit={handleSave} className="p-6 space-y-4 overflow-y-auto">
               {errorMessage && (
                 <div className="p-3.5 rounded-2xl bg-rose-50 text-rose-700 text-xs font-bold border border-rose-200">
                   {errorMessage}
@@ -244,29 +229,6 @@ export const CategoryManagementView: React.FC<CategoryManagementViewProps> = ({
                 />
               </div>
 
-              {/* Icon Selection */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-2">Ícono Representativo</label>
-                <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
-                  {AVAILABLE_ICONS.map((i) => {
-                    const IconC = i.icon;
-                    const isSelected = icon === i.value;
-                    return (
-                      <button
-                        key={i.value}
-                        type="button"
-                        onClick={() => setIcon(i.value)}
-                        className={`p-3 rounded-2xl border flex flex-col items-center justify-center transition-all ${
-                          isSelected ? 'border-orange-500 bg-orange-50 text-orange-700 font-bold' : 'border-yellow-200 text-slate-600 hover:bg-yellow-50'
-                        }`}
-                      >
-                        <IconC className="w-5 h-5" />
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
               {/* Color Selection */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-2">Color Distintivo</label>
@@ -278,9 +240,22 @@ export const CategoryManagementView: React.FC<CategoryManagementViewProps> = ({
                       onClick={() => setColor(col)}
                       className={`w-7 h-7 rounded-full transition-transform ${color === col ? 'scale-125 ring-2 ring-offset-2 ring-orange-500' : 'hover:scale-110'}`}
                       style={{ backgroundColor: col }}
+                      title={`Color ${col}`}
                     />
                   ))}
                 </div>
+              </div>
+
+              {/* Icon Selection with CategoryIconPicker */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-2">
+                  Ícono Representativo (+400 íconos para elegir)
+                </label>
+                <CategoryIconPicker
+                  selectedIcon={icon}
+                  selectedColor={color}
+                  onSelectIcon={setIcon}
+                />
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-yellow-100">

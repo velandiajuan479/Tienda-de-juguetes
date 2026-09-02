@@ -18,6 +18,7 @@ import {
 import { Toy, Category, UserProfile, UserRole } from '../types';
 import { ToyModel } from '../models/ToyModel';
 import { UserModel } from '../models/UserModel';
+import { CategoryIcon } from '../components/CategoryIcon';
 
 interface CatalogViewProps {
   toys: Toy[];
@@ -187,6 +188,11 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                     : 'bg-white text-slate-700 hover:bg-yellow-50 border border-yellow-200'
                 }`}
               >
+                <CategoryIcon 
+                  name={cat.icon} 
+                  color={isSelected ? '#ffffff' : cat.color || '#f59e0b'} 
+                  className="w-3.5 h-3.5" 
+                />
                 <span>{cat.name}</span>
                 <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${isSelected ? 'bg-white/25 text-white' : 'bg-yellow-100 text-slate-700'}`}>
                   {count}
