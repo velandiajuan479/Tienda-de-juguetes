@@ -136,19 +136,19 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
       />
 
       <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md sm:max-w-lg bg-white shadow-2xl flex flex-col justify-between">
+        <div className="w-screen max-w-md sm:max-w-lg bg-white dark:bg-slate-900 shadow-2xl flex flex-col justify-between border-l border-transparent dark:border-slate-800 transition-colors">
           
           {/* Header */}
-          <div className="px-6 py-5 border-b border-yellow-200 flex items-center justify-between bg-yellow-50/80">
+          <div className="px-6 py-5 border-b border-yellow-200 dark:border-slate-800 flex items-center justify-between bg-yellow-50/80 dark:bg-slate-800/80">
             <div className="flex items-center gap-2.5">
               <div className="p-2.5 rounded-2xl bg-orange-500 text-white font-bold shadow-xs">
                 <Receipt className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-lg font-black text-slate-900 font-display">
+                <h2 className="text-lg font-black text-slate-900 dark:text-white font-display">
                   {isCheckingOut ? 'Generar Factura Fiscal' : 'Carrito de Compras'}
                 </h2>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   {isCheckingOut ? 'Completa los datos de facturación' : `${cart.length} productos seleccionados`}
                 </p>
               </div>
@@ -156,7 +156,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
             <button
               onClick={onClose}
-              className="p-2 text-slate-400 hover:text-slate-600 rounded-2xl hover:bg-yellow-100 transition-colors"
+              className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-2xl hover:bg-yellow-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -174,16 +174,16 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
             {/* If cart is empty */}
             {cart.length === 0 ? (
               <div className="text-center py-16">
-                <div className="w-16 h-16 rounded-3xl bg-yellow-100 text-orange-600 flex items-center justify-center mx-auto mb-4 border border-yellow-200">
+                <div className="w-16 h-16 rounded-3xl bg-yellow-100 dark:bg-slate-800 text-orange-600 dark:text-orange-400 flex items-center justify-center mx-auto mb-4 border border-yellow-200 dark:border-slate-700">
                   <ShoppingBag className="w-8 h-8" />
                 </div>
-                <h3 className="text-base font-black text-slate-900 font-display">El carrito está vacío</h3>
-                <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
+                <h3 className="text-base font-black text-slate-900 dark:text-white font-display">El carrito está vacío</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-xs mx-auto">
                   Agrega juguetes desde el catálogo para calcular precios y emitir facturas.
                 </p>
                 <button
                   onClick={onClose}
-                  className="mt-5 px-6 py-3 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-black shadow-md"
+                  className="mt-5 px-6 py-3 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-black shadow-md cursor-pointer"
                 >
                   Explorar Catálogo
                 </button>
@@ -191,9 +191,9 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
             ) : !isCheckingOut ? (
               /* Normal Cart Items View */
               <div className="space-y-4">
-                <div className="flex items-center justify-between text-xs font-black text-slate-500 pb-2 border-b border-yellow-100">
+                <div className="flex items-center justify-between text-xs font-black text-slate-500 dark:text-slate-400 pb-2 border-b border-yellow-100 dark:border-slate-800">
                   <span>Productos en la orden</span>
-                  <button onClick={onClearCart} className="text-rose-500 hover:underline font-bold">
+                  <button onClick={onClearCart} className="text-rose-500 dark:text-rose-400 hover:underline font-bold cursor-pointer">
                     Vaciar Carrito
                   </button>
                 </div>
@@ -211,47 +211,55 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     return (
                       <div
                         key={toy.id}
-                        className="p-4 rounded-[1.5rem] bg-amber-50/40 border border-yellow-200/90 flex gap-3 items-center"
+                        className="p-4 rounded-[1.5rem] bg-amber-50/40 dark:bg-slate-800/50 border border-yellow-200/90 dark:border-slate-700 flex gap-3 items-center"
                       >
                         <img
                           src={toy.imageUrl}
                           alt={toy.name}
-                          className="w-16 h-16 rounded-2xl object-cover bg-white shrink-0 border border-yellow-200"
+                          className="w-16 h-16 rounded-2xl object-cover bg-white dark:bg-slate-800 shrink-0 border border-yellow-200 dark:border-slate-700"
                           referrerPolicy="no-referrer"
                         />
                         <div className="flex-1 min-w-0">
-                          <h4 className="text-xs font-black text-slate-900 truncate">{toy.name}</h4>
-                          <div className="text-[11px] text-slate-500 mt-0.5">
-                            <span>Base: {ToyModel.formatCurrency(b.basePrice)}</span> ·{' '}
-                            <span className="text-indigo-600 font-bold">IVA {b.taxRate}%</span> ·{' '}
-                            <span className="text-orange-600 font-bold">
-                              Desc {toy.discountType === 'percentage' ? `${toy.discountValue}%` : ToyModel.formatCurrency(toy.discountValue)}
+                          <h4 className="text-xs font-black text-slate-900 dark:text-white truncate">{toy.name}</h4>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 flex flex-wrap items-center gap-1.5">
+                            <span>Base: {ToyModel.formatCurrency(b.basePrice)}</span>
+                            <span>·</span>
+                            <span className="text-indigo-700 dark:text-indigo-300 font-bold bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-900/40 px-1.5 py-0.5 rounded-md">
+                              IVA ({b.taxRate}%): +{ToyModel.formatCurrency(b.taxAmount * quantity)}
                             </span>
+                            {b.discountAmount > 0 && (
+                              <>
+                                <span>·</span>
+                                <span className="text-orange-600 dark:text-orange-400 font-bold">
+                                  Desc {toy.discountType === 'percentage' ? `${toy.discountValue}%` : ToyModel.formatCurrency(toy.discountValue)}
+                                </span>
+                              </>
+                            )}
                           </div>
-                          <div className="text-xs font-extrabold text-slate-900 mt-1">
+                          <div className="text-xs font-extrabold text-slate-900 dark:text-slate-100 mt-1">
                             {ToyModel.formatCurrency(b.finalPrice)} c/u
                           </div>
                         </div>
 
                         {/* Quantity Controls */}
                         <div className="flex flex-col items-end gap-2">
-                          <div className="flex items-center border border-yellow-300 rounded-xl bg-white overflow-hidden shadow-xs">
+                          <div className="flex items-center border border-yellow-300 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 overflow-hidden shadow-xs">
                             <button
                               onClick={() => onUpdateQuantity(toy.id, -1)}
-                              className="p-1.5 text-slate-600 hover:bg-yellow-50"
+                              className="p-1.5 text-slate-600 dark:text-slate-300 hover:bg-yellow-50 dark:hover:bg-slate-700 cursor-pointer"
                             >
                               <Minus className="w-3 h-3" />
                             </button>
-                            <span className="px-2.5 text-xs font-black text-slate-900">{quantity}</span>
+                            <span className="px-2.5 text-xs font-black text-slate-900 dark:text-white">{quantity}</span>
                             <button
                               onClick={() => onUpdateQuantity(toy.id, 1)}
                               disabled={quantity >= toy.stock}
-                              className="p-1.5 text-slate-600 hover:bg-yellow-50 disabled:opacity-30"
+                              className="p-1.5 text-slate-600 dark:text-slate-300 hover:bg-yellow-50 dark:hover:bg-slate-700 disabled:opacity-30 cursor-pointer"
                             >
                               <Plus className="w-3 h-3" />
                             </button>
                           </div>
-                          <div className="text-xs font-black text-slate-900 font-display">
+                          <div className="text-xs font-black text-slate-900 dark:text-white font-display">
                             {ToyModel.formatCurrency(itemTotal)}
                           </div>
                         </div>
@@ -263,15 +271,15 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
             ) : (
               /* Checkout / Invoice Billing Form */
               <form id="checkout-invoice-form" onSubmit={handleGenerateInvoice} className="space-y-4">
-                <div className="p-4 bg-orange-500/10 rounded-2xl border border-orange-200 flex items-start gap-2.5">
-                  <FileText className="w-4 h-4 text-orange-600 shrink-0 mt-0.5" />
-                  <p className="text-xs text-orange-950 font-medium leading-relaxed">
+                <div className="p-4 bg-orange-500/10 dark:bg-orange-950/30 rounded-2xl border border-orange-200 dark:border-orange-800/50 flex items-start gap-2.5">
+                  <FileText className="w-4 h-4 text-orange-600 dark:text-orange-400 shrink-0 mt-0.5" />
+                  <p className="text-xs text-orange-950 dark:text-orange-200 font-medium leading-relaxed">
                     La factura se registrará con numeración correlativa y aplicará el desglose exacto de impuestos y descuentos fiscales en Pesos Colombianos (COP).
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Nombre Completo / Razón Social *</label>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Nombre Completo / Razón Social *</label>
                   <div className="relative">
                     <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-400" />
                     <input
@@ -281,14 +289,14 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       placeholder="Ej. Juan Pérez o Inversiones S.A.S."
                       value={customerName}
                       onChange={(e) => setCustomerName(e.target.value)}
-                      className="w-full pl-10 pr-3 py-2.5 rounded-2xl bg-[#FFFBEB] border border-yellow-300 text-xs font-medium focus:outline-orange-500"
+                      className="w-full pl-10 pr-3 py-2.5 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-xs font-medium text-slate-800 dark:text-slate-100 focus:outline-orange-500"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Documento / Cédula / NIT *</label>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Documento / Cédula / NIT *</label>
                     <input
                       id="invoice-customer-doc"
                       type="text"
@@ -296,12 +304,12 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       placeholder="1094829104"
                       value={customerDocument}
                       onChange={(e) => setCustomerDocument(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-2xl bg-[#FFFBEB] border border-yellow-300 text-xs font-mono font-bold focus:outline-orange-500"
+                      className="w-full px-3.5 py-2.5 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-xs font-mono font-bold text-slate-800 dark:text-slate-100 focus:outline-orange-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Teléfono Móvil</label>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Teléfono Móvil</label>
                     <div className="relative">
                       <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-orange-400" />
                       <input
@@ -309,14 +317,14 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                         placeholder="+57 300 000 0000"
                         value={customerPhone}
                         onChange={(e) => setCustomerPhone(e.target.value)}
-                        className="w-full pl-9 pr-3 py-2.5 rounded-2xl bg-[#FFFBEB] border border-yellow-300 text-xs font-medium focus:outline-orange-500"
+                        className="w-full pl-9 pr-3 py-2.5 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-xs font-medium text-slate-800 dark:text-slate-100 focus:outline-orange-500"
                       />
                     </div>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Correo Electrónico para Factura *</label>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Correo Electrónico para Factura *</label>
                   <div className="relative">
                     <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-400" />
                     <input
@@ -326,13 +334,13 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       placeholder="cliente@correo.com"
                       value={customerEmail}
                       onChange={(e) => setCustomerEmail(e.target.value)}
-                      className="w-full pl-10 pr-3 py-2.5 rounded-2xl bg-[#FFFBEB] border border-yellow-300 text-xs font-medium focus:outline-orange-500"
+                      className="w-full pl-10 pr-3 py-2.5 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-xs font-medium text-slate-800 dark:text-slate-100 focus:outline-orange-500"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Dirección de Entrega / Facturación</label>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Dirección de Entrega / Facturación</label>
                   <div className="relative">
                     <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-400" />
                     <input
@@ -340,14 +348,14 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       placeholder="Dirección, Ciudad"
                       value={customerAddress}
                       onChange={(e) => setCustomerAddress(e.target.value)}
-                      className="w-full pl-10 pr-3 py-2.5 rounded-2xl bg-[#FFFBEB] border border-yellow-300 text-xs font-medium focus:outline-orange-500"
+                      className="w-full pl-10 pr-3 py-2.5 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-xs font-medium text-slate-800 dark:text-slate-100 focus:outline-orange-500"
                     />
                   </div>
                 </div>
 
                 {/* Payment Method Selector */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">Método de Pago</label>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Método de Pago</label>
                   <div className="grid grid-cols-2 gap-2">
                     {[
                       { id: 'tarjeta', label: 'Tarjeta Crédito/Débito', icon: CreditCard },
@@ -359,10 +367,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                         key={m.id}
                         type="button"
                         onClick={() => setPaymentMethod(m.id as PaymentMethod)}
-                        className={`p-3 rounded-2xl border text-left text-xs font-bold flex items-center gap-2 transition-all ${
+                        className={`p-3 rounded-2xl border text-left text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
                           paymentMethod === m.id
-                            ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-xs'
-                            : 'border-yellow-200 text-slate-700 hover:bg-yellow-50'
+                            ? 'border-orange-500 bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300 shadow-xs'
+                            : 'border-yellow-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-yellow-50 dark:hover:bg-slate-800'
                         }`}
                       >
                         <m.icon className="w-4 h-4 shrink-0 text-orange-500" />
@@ -377,24 +385,27 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
           {/* Summary Breakdown Footer */}
           {cart.length > 0 && (
-            <div className="p-6 bg-yellow-50/70 border-t border-yellow-200 space-y-4">
+            <div className="p-6 bg-yellow-50/70 dark:bg-slate-800/90 border-t border-yellow-200 dark:border-slate-700 space-y-4">
               <div className="space-y-1.5 text-xs">
-                <div className="flex justify-between text-slate-600">
+                <div className="flex justify-between text-slate-600 dark:text-slate-400">
                   <span className="font-medium">Subtotal Base:</span>
-                  <span className="font-bold text-slate-900">{ToyModel.formatCurrency(summary.subtotalBase)}</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{ToyModel.formatCurrency(summary.subtotalBase)}</span>
                 </div>
-                <div className="flex justify-between text-indigo-700">
-                  <span className="font-medium">Total Impuestos (IVA):</span>
-                  <span className="font-black">+{ToyModel.formatCurrency(summary.totalTaxes)}</span>
+                <div className="flex justify-between items-center text-indigo-800 dark:text-indigo-200 bg-indigo-50/90 dark:bg-indigo-950/50 px-3 py-2 rounded-xl border border-indigo-200 dark:border-indigo-800/60">
+                  <div>
+                    <span className="font-bold block text-xs">Impuesto (IVA 19%):</span>
+                    <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-medium">Desglosado para tu compra y factura</span>
+                  </div>
+                  <span className="font-black text-xs">+{ToyModel.formatCurrency(summary.totalTaxes)}</span>
                 </div>
-                <div className="flex justify-between text-orange-700">
+                <div className="flex justify-between text-orange-700 dark:text-orange-400">
                   <span className="font-medium">Total Descuentos Aplicados:</span>
                   <span className="font-black">-{ToyModel.formatCurrency(summary.totalDiscounts)}</span>
                 </div>
 
-                <div className="pt-3 border-t border-yellow-200 flex justify-between items-baseline">
-                  <span className="text-sm font-black text-slate-900 font-display">TOTAL A PAGAR:</span>
-                  <span className="text-xl sm:text-2xl font-black text-slate-900 font-display">
+                <div className="pt-3 border-t border-yellow-200 dark:border-slate-700 flex justify-between items-baseline">
+                  <span className="text-sm font-black text-slate-900 dark:text-white font-display">TOTAL A PAGAR:</span>
+                  <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-display">
                     {ToyModel.formatCurrency(summary.grandTotal)}
                   </span>
                 </div>
@@ -415,7 +426,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   <button
                     type="button"
                     onClick={() => setIsCheckingOut(false)}
-                    className="px-5 py-3 rounded-2xl border border-slate-200 bg-white text-slate-700 text-xs font-bold hover:bg-slate-50"
+                    className="px-5 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer"
                   >
                     Volver
                   </button>
@@ -424,7 +435,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     type="submit"
                     form="checkout-invoice-form"
                     disabled={isSubmitting}
-                    className="flex-1 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-black shadow-[0_4px_0_0_rgba(16,185,129,1)] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2"
+                    className="flex-1 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-black shadow-[0_4px_0_0_rgba(16,185,129,1)] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
                     {isSubmitting ? (
                       <span>Generando Factura...</span>

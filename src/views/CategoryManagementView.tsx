@@ -109,14 +109,14 @@ export const CategoryManagementView: React.FC<CategoryManagementViewProps> = ({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/15 text-orange-700 text-xs font-black mb-2 border border-orange-200">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/15 dark:bg-orange-500/20 text-orange-700 dark:text-orange-300 text-xs font-black mb-2 border border-orange-200 dark:border-orange-500/30">
             <Layers className="w-3.5 h-3.5" />
             <span>Módulo de Categorías (Admin)</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 font-display tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-display tracking-tight">
             Gestión de Categorías de Juguetes
           </h1>
-          <p className="text-sm text-slate-600 mt-1 font-medium">
+          <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 font-medium">
             Organiza los juguetes por colecciones, grupos de edad e intereses temáticos.
           </p>
         </div>
@@ -124,7 +124,7 @@ export const CategoryManagementView: React.FC<CategoryManagementViewProps> = ({
         <button
           id="btn-add-category-modal"
           onClick={handleOpenCreate}
-          className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs sm:text-sm font-black shadow-[0_4px_0_0_rgba(16,185,129,1)] active:translate-y-1 active:shadow-none transition-all"
+          className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs sm:text-sm font-black shadow-[0_4px_0_0_rgba(16,185,129,1)] active:translate-y-1 active:shadow-none transition-all cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Nueva Categoría</span>
@@ -140,12 +140,12 @@ export const CategoryManagementView: React.FC<CategoryManagementViewProps> = ({
             <div
               key={cat.id}
               id={`category-card-${cat.id}`}
-              className="bg-white rounded-[2rem] p-6 border border-yellow-200/90 hover:border-orange-300 shadow-sm hover:shadow-xl transition-all flex flex-col justify-between"
+              className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 border border-yellow-200/90 dark:border-slate-800 hover:border-orange-300 dark:hover:border-orange-500 shadow-sm hover:shadow-xl transition-all flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-start justify-between gap-3 mb-4">
                   <div
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-xs border border-yellow-200/60"
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-xs border border-yellow-200/60 dark:border-slate-700"
                     style={{ backgroundColor: `${cat.color || '#f59e0b'}20` }}
                   >
                     {renderCategoryIcon(cat.icon, cat.color || '#f59e0b')}
@@ -154,14 +154,14 @@ export const CategoryManagementView: React.FC<CategoryManagementViewProps> = ({
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => handleOpenEdit(cat)}
-                      className="p-2 rounded-xl text-slate-400 hover:text-orange-600 hover:bg-orange-50 transition-colors"
+                      className="p-2 rounded-xl text-slate-400 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                       title="Editar categoría"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => setDeletingCatId(cat.id)}
-                      className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                      className="p-2 rounded-xl text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                       title="Eliminar categoría"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -169,15 +169,15 @@ export const CategoryManagementView: React.FC<CategoryManagementViewProps> = ({
                   </div>
                 </div>
 
-                <h3 className="text-lg font-black text-slate-900 font-display">{cat.name}</h3>
-                <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                <h3 className="text-lg font-black text-slate-900 dark:text-white font-display">{cat.name}</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 leading-relaxed">
                   {cat.description || 'Sin descripción disponible.'}
                 </p>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-yellow-100 flex items-center justify-between text-xs">
-                <span className="text-slate-500 font-semibold">Juguetes vinculados:</span>
-                <span className="font-bold px-3 py-1 rounded-full bg-yellow-100 text-orange-950">
+              <div className="mt-6 pt-4 border-t border-yellow-100 dark:border-slate-800 flex items-center justify-between text-xs">
+                <span className="text-slate-500 dark:text-slate-400 font-semibold">Juguetes vinculados:</span>
+                <span className="font-bold px-3 py-1 rounded-full bg-yellow-100 dark:bg-slate-800 text-orange-950 dark:text-orange-300">
                   {toyCount} {toyCount === 1 ? 'juguete' : 'juguetes'}
                 </span>
               </div>
@@ -189,56 +189,56 @@ export const CategoryManagementView: React.FC<CategoryManagementViewProps> = ({
       {/* Category Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white w-full max-w-2xl max-h-[92vh] flex flex-col rounded-[2rem] shadow-2xl border border-yellow-200 overflow-hidden">
-            <div className="px-6 py-4 border-b border-yellow-200 flex items-center justify-between bg-yellow-50/70 shrink-0">
-              <h3 className="text-base font-black text-slate-900 font-display">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-2xl max-h-[92vh] flex flex-col rounded-[2rem] shadow-2xl border border-yellow-200 dark:border-slate-800 overflow-hidden">
+            <div className="px-6 py-4 border-b border-yellow-200 dark:border-slate-800 flex items-center justify-between bg-yellow-50/70 dark:bg-slate-800/80 shrink-0">
+              <h3 className="text-base font-black text-slate-900 dark:text-white font-display">
                 {editingId ? 'Editar Categoría' : 'Crear Nueva Categoría'}
               </h3>
-              <button onClick={() => setIsModalOpen(false)} className="p-1.5 text-slate-400 hover:text-slate-600">
+              <button onClick={() => setIsModalOpen(false)} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleSave} className="p-6 space-y-4 overflow-y-auto">
               {errorMessage && (
-                <div className="p-3.5 rounded-2xl bg-rose-50 text-rose-700 text-xs font-bold border border-rose-200">
+                <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold">
                   {errorMessage}
                 </div>
               )}
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Nombre de la Categoría *</label>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Nombre de la Categoría *</label>
                 <input
                   type="text"
                   required
                   placeholder="Ej. Robótica y Drones"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-2 rounded-2xl bg-[#FFFBEB] border border-yellow-300 text-sm font-medium focus:outline-orange-500"
+                  className="w-full px-4 py-2 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-sm font-medium text-slate-800 dark:text-slate-100 focus:outline-orange-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Descripción</label>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Descripción</label>
                 <textarea
                   rows={2}
                   placeholder="Breve reseña sobre los juguetes de esta categoría..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-4 py-2 rounded-2xl bg-[#FFFBEB] border border-yellow-300 text-sm font-medium focus:outline-orange-500"
+                  className="w-full px-4 py-2 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-sm font-medium text-slate-800 dark:text-slate-100 focus:outline-orange-500"
                 />
               </div>
 
               {/* Color Selection */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-2">Color Distintivo</label>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">Color Distintivo</label>
                 <div className="flex items-center gap-2">
                   {PRESET_COLORS.map((col) => (
                     <button
                       key={col}
                       type="button"
                       onClick={() => setColor(col)}
-                      className={`w-7 h-7 rounded-full transition-transform ${color === col ? 'scale-125 ring-2 ring-offset-2 ring-orange-500' : 'hover:scale-110'}`}
+                      className={`w-7 h-7 rounded-full transition-transform cursor-pointer ${color === col ? 'scale-125 ring-2 ring-offset-2 ring-orange-500' : 'hover:scale-110'}`}
                       style={{ backgroundColor: col }}
                       title={`Color ${col}`}
                     />
@@ -248,7 +248,7 @@ export const CategoryManagementView: React.FC<CategoryManagementViewProps> = ({
 
               {/* Icon Selection with CategoryIconPicker */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-2">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">
                   Ícono Representativo (+400 íconos para elegir)
                 </label>
                 <CategoryIconPicker
@@ -258,18 +258,18 @@ export const CategoryManagementView: React.FC<CategoryManagementViewProps> = ({
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-yellow-100">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-yellow-100 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-5 py-2.5 rounded-2xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50"
+                  className="px-5 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="px-6 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black shadow-[0_4px_0_0_rgba(16,185,129,1)] active:translate-y-1 active:shadow-none transition-all flex items-center gap-1.5"
+                  className="px-6 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black shadow-[0_4px_0_0_rgba(16,185,129,1)] active:translate-y-1 active:shadow-none transition-all flex items-center gap-1.5 cursor-pointer"
                 >
                   <Check className="w-4 h-4" />
                   <span>{editingId ? 'Actualizar' : 'Guardar'}</span>
@@ -283,19 +283,19 @@ export const CategoryManagementView: React.FC<CategoryManagementViewProps> = ({
       {/* Delete Confirmation Modal */}
       {deletingCatId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white max-w-sm w-full rounded-[2rem] p-6 shadow-2xl border border-yellow-200 text-center">
-            <h3 className="text-base font-black text-slate-900 font-display">¿Eliminar categoría?</h3>
-            <p className="text-xs text-slate-500 mt-1">Los juguetes asignados quedarán sin categoría.</p>
+          <div className="bg-white dark:bg-slate-900 max-w-sm w-full rounded-[2rem] p-6 shadow-2xl border border-yellow-200 dark:border-slate-800 text-center">
+            <h3 className="text-base font-black text-slate-900 dark:text-white font-display">¿Eliminar categoría?</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Los juguetes asignados quedarán sin categoría.</p>
             <div className="flex justify-center gap-3 mt-4">
               <button
                 onClick={() => setDeletingCatId(null)}
-                className="px-4 py-2 rounded-2xl border border-slate-200 text-xs font-bold text-slate-600"
+                className="px-4 py-2 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
               >
                 Cancelar
               </button>
               <button
                 onClick={() => handleDelete(deletingCatId)}
-                className="px-5 py-2 rounded-2xl bg-rose-600 text-white text-xs font-bold shadow-sm"
+                className="px-5 py-2 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-sm cursor-pointer"
               >
                 Eliminar
               </button>

@@ -49,6 +49,28 @@ export default function App() {
     return saved ? JSON.parse(saved) : null;
   });
 
+  // Dark / Light Theme State
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    const saved = localStorage.getItem('toystore_theme');
+    if (saved) return saved === 'dark';
+    return typeof window !== 'undefined' && window.matchMedia
+      ? window.matchMedia('(prefers-color-scheme: dark)').matches
+      : false;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('toystore_theme', isDarkMode ? 'dark' : 'light');
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode]);
+
+  const handleToggleDarkMode = () => {
+    setIsDarkMode((prev) => !prev);
+  };
+
   // Modals and Drawers
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -174,7 +196,7 @@ export default function App() {
   const role: UserRole = currentUser?.role || 'cliente';
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FFFBEB] text-slate-800 selection:bg-orange-500 selection:text-white font-sans">
+    <div className="min-h-screen flex flex-col bg-[#FFFBEB] dark:bg-slate-950 text-slate-800 dark:text-slate-100 selection:bg-orange-500 selection:text-white font-sans transition-colors duration-200">
       
       {/* Toast Notification with Vibrant Styling */}
       {toastMessage && (
@@ -196,6 +218,8 @@ export default function App() {
         onSignOut={handleSignOut}
         cartCount={totalCartItemsCount}
         onOpenCart={() => setIsCartOpen(true)}
+        isDarkMode={isDarkMode}
+        onToggleDarkMode={handleToggleDarkMode}
       />
 
       {/* Main View Router */}
@@ -305,24 +329,24 @@ export default function App() {
       />
 
       {/* Footer */}
-      <footer className="bg-white/80 backdrop-blur-sm border-t border-yellow-200 py-8 px-4 sm:px-6 lg:px-8 mt-16 print:hidden">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-600">
+      <footer className="bg-white/80 dark:bg-slate-900/90 backdrop-blur-sm border-t border-yellow-200 dark:border-slate-800 py-8 px-4 sm:px-6 lg:px-8 mt-16 print:hidden transition-colors">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-600 dark:text-slate-400">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-xl bg-orange-500 flex items-center justify-center text-white font-black rotate-3 shadow-xs">
               <span className="text-xs">🧸</span>
             </div>
-            <span className="font-black text-slate-900 font-display">ToyStore Kids</span>
-            <span className="text-slate-400">· Tienda de Juguetes</span>
+            <span className="font-black text-slate-900 dark:text-white font-display">ToyStore Kids</span>
+            <span className="text-slate-400 dark:text-slate-500">· Tienda de Juguetes</span>
           </div>
 
-          <div className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+          <div className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
             <span>Desarrollado por</span>
-            <span className="font-black text-orange-600 bg-orange-50 px-2.5 py-1 rounded-full border border-orange-200">
+            <span className="font-black text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-slate-800 px-2.5 py-1 rounded-full border border-orange-200 dark:border-slate-700">
               Juan Velandia
             </span>
           </div>
 
-          <div className="text-[11px] font-medium text-slate-500">
+          <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
             © {new Date().getFullYear()} ToyStore Kids · Todos los derechos reservados
           </div>
         </div>

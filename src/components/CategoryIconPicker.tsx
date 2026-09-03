@@ -54,29 +54,29 @@ export const CategoryIconPicker: React.FC<CategoryIconPickerProps> = ({
   return (
     <div className="space-y-3">
       {/* Header and selected preview */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-amber-50/80 border border-amber-200/80">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-amber-50/80 dark:bg-slate-800 border border-amber-200/80 dark:border-slate-700">
         <div className="flex items-center gap-3">
           <div
-            className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-xs border border-white/60 transition-colors"
+            className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-xs border border-white/60 dark:border-slate-700 transition-colors"
             style={{ backgroundColor: `${selectedColor}22` }}
           >
             <CategoryIcon name={selectedIcon} color={selectedColor} className="w-6 h-6" />
           </div>
           <div>
-            <div className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-amber-800">
-              <Sparkles className="w-3 h-3 text-amber-600" />
+            <div className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-amber-800 dark:text-amber-300">
+              <Sparkles className="w-3 h-3 text-amber-600 dark:text-amber-400" />
               <span>Ícono Seleccionado</span>
             </div>
-            <div className="text-sm font-black text-slate-900 leading-snug">
+            <div className="text-sm font-black text-slate-900 dark:text-white leading-snug">
               {currentIconInfo.label}
             </div>
-            <div className="text-[11px] text-slate-500 font-mono">
-              Código: <span className="font-bold text-slate-700">{selectedIcon}</span>
+            <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+              Código: <span className="font-bold text-slate-700 dark:text-slate-200">{selectedIcon}</span>
             </div>
           </div>
         </div>
 
-        <div className="text-xs font-bold text-amber-900/80 bg-amber-100/70 px-3 py-1.5 rounded-xl self-start sm:self-auto">
+        <div className="text-xs font-bold text-amber-900/80 dark:text-amber-300 bg-amber-100/70 dark:bg-amber-950/60 px-3 py-1.5 rounded-xl self-start sm:self-auto border dark:border-amber-800/40">
           {CATEGORY_ICONS.length} íconos disponibles
         </div>
       </div>
@@ -89,13 +89,13 @@ export const CategoryIconPicker: React.FC<CategoryIconPickerProps> = ({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Buscar entre +400 íconos (ej. robot, auto, dado, música, estrella, lego)..."
-          className="w-full pl-10 pr-9 py-2 rounded-2xl bg-[#FFFBEB] border border-yellow-300 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-orange-500 focus:bg-white transition-all"
+          className="w-full pl-10 pr-9 py-2 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-xs font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-orange-500 focus:bg-white dark:focus:bg-slate-800 transition-all"
         />
         {search && (
           <button
             type="button"
             onClick={() => setSearch('')}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -116,10 +116,10 @@ export const CategoryIconPicker: React.FC<CategoryIconPickerProps> = ({
               key={group}
               type="button"
               onClick={() => setActiveGroup(group)}
-              className={`px-3 py-1.5 rounded-xl font-bold whitespace-nowrap text-[11px] transition-all ${
+              className={`px-3 py-1.5 rounded-xl font-bold whitespace-nowrap text-[11px] transition-all cursor-pointer ${
                 isActive
                   ? 'bg-orange-500 text-white shadow-xs'
-                  : 'bg-yellow-50/80 hover:bg-yellow-100 text-slate-700 border border-yellow-200/80'
+                  : 'bg-yellow-50/80 dark:bg-slate-800 hover:bg-yellow-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-yellow-200/80 dark:border-slate-700'
               }`}
             >
               {group} ({count})
@@ -129,15 +129,15 @@ export const CategoryIconPicker: React.FC<CategoryIconPickerProps> = ({
       </div>
 
       {/* Grid of Icons */}
-      <div className="rounded-2xl border border-yellow-200 bg-[#FFFBEB]/40 p-2.5">
-        <div className="flex items-center justify-between text-[11px] font-bold text-slate-500 mb-2 px-1">
+      <div className="rounded-2xl border border-yellow-200 dark:border-slate-700 bg-[#FFFBEB]/40 dark:bg-slate-800/60 p-2.5">
+        <div className="flex items-center justify-between text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 px-1">
           <span>Mostrando {filteredIcons.length} íconos</span>
           {filteredIcons.length > 0 && <span>Haz clic para seleccionar</span>}
         </div>
 
         {filteredIcons.length === 0 ? (
           <div className="py-8 text-center px-4">
-            <p className="text-xs font-bold text-slate-600">
+            <p className="text-xs font-bold text-slate-600 dark:text-slate-300">
               No encontramos íconos que coincidan con "{search}"
             </p>
             <p className="text-[11px] text-slate-400 mt-1">
@@ -149,7 +149,7 @@ export const CategoryIconPicker: React.FC<CategoryIconPickerProps> = ({
                 setSearch('');
                 setActiveGroup('Todos');
               }}
-              className="mt-3 px-3 py-1.5 text-xs font-black text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-xl border border-orange-200 transition-colors"
+              className="mt-3 px-3 py-1.5 text-xs font-black text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/60 hover:bg-orange-100 dark:hover:bg-orange-900/60 rounded-xl border border-orange-200 dark:border-orange-800/50 transition-colors cursor-pointer"
             >
               Restablecer filtros
             </button>
@@ -164,10 +164,10 @@ export const CategoryIconPicker: React.FC<CategoryIconPickerProps> = ({
                   type="button"
                   onClick={() => onSelectIcon(item.name)}
                   title={`${item.label} (${item.name})`}
-                  className={`group relative p-2.5 rounded-xl border flex flex-col items-center justify-center transition-all ${
+                  className={`group relative p-2.5 rounded-xl border flex flex-col items-center justify-center transition-all cursor-pointer ${
                     isSelected
-                      ? 'border-orange-500 bg-orange-100/90 text-orange-700 font-bold ring-2 ring-orange-400 ring-offset-1 shadow-xs scale-105 z-10'
-                      : 'border-yellow-200/80 bg-white/90 text-slate-700 hover:bg-yellow-50 hover:border-orange-300 hover:scale-105'
+                      ? 'border-orange-500 bg-orange-100/90 dark:bg-orange-950/70 text-orange-700 dark:text-orange-300 font-bold ring-2 ring-orange-400 ring-offset-1 shadow-xs scale-105 z-10'
+                      : 'border-yellow-200/80 dark:border-slate-700 bg-white/90 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-yellow-50 dark:hover:bg-slate-700 hover:border-orange-300 hover:scale-105'
                   }`}
                 >
                   <CategoryIcon
