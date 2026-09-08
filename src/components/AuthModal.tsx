@@ -19,7 +19,6 @@ import {
 } from 'lucide-react';
 import { AuthController } from '../controllers/AuthController';
 import { UserRole, UserProfile } from '../types';
-import { ROLE_PASSWORDS } from '../models/UserModel';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 interface AuthModalProps {
@@ -498,7 +497,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
                             />
                           </div>
                           <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">
-                            Claves activas: Empleado: <code className="font-bold text-slate-800 dark:text-slate-200">{ROLE_PASSWORDS.empleado}</code> · Admin: <code className="font-bold text-slate-800 dark:text-slate-200">{ROLE_PASSWORDS.admin}</code>
+                            Clave confidencial de seguridad provista por la administración de la tienda.
                           </p>
                         </div>
                       </div>

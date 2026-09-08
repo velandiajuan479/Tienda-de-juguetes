@@ -10,7 +10,7 @@ import {
 import { doc, getDoc, setDoc, updateDoc, collection, getDocs } from 'firebase/firestore';
 import { auth, googleProvider, db } from '../services/firebase';
 import { UserProfile, UserRole } from '../types';
-import { UserModel, ROLE_PASSWORDS } from '../models/UserModel';
+import { UserModel } from '../models/UserModel';
 
 const USERS_COLLECTION = 'users';
 const CURRENT_USER_KEY = 'toystore_current_user_profile';
@@ -221,7 +221,7 @@ export class AuthController {
     if (requestedRole === 'empleado' || requestedRole === 'admin') {
       if (!rolePassword || !UserModel.verifyRolePassword(requestedRole, rolePassword)) {
         throw new Error(
-          `Clave de autorización incorrecta para el rol "${requestedRole.toUpperCase()}". Usa "${ROLE_PASSWORDS.empleado}" para Empleado o "${ROLE_PASSWORDS.admin}" para Administrador.`
+          `Clave de autorización incorrecta para el rol "${requestedRole.toUpperCase()}". Por favor verifica los datos ingresados.`
         );
       }
       finalRole = requestedRole;
@@ -280,7 +280,7 @@ export class AuthController {
 
     if (!UserModel.verifyRolePassword(targetRole, authPassword)) {
       throw new Error(
-        `Clave de autorización incorrecta para ${targetRole.toUpperCase()}. La clave para Empleado es "${ROLE_PASSWORDS.empleado}" y para Administrador es "${ROLE_PASSWORDS.admin}".`
+        `Clave de autorización incorrecta para el rol de ${targetRole.toUpperCase()}. Por favor verifica los datos ingresados.`
       );
     }
 
