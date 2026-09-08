@@ -123,9 +123,11 @@ export const InvoicesListView: React.FC<InvoicesListViewProps> = ({
         </div>
       </div>
 
-      {/* Invoices List / Table */}
+      {/* Invoices List / Table & Mobile Cards */}
       <div className="bg-white dark:bg-slate-900 rounded-[2rem] border border-yellow-200/90 dark:border-slate-800 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+        
+        {/* Desktop Table */}
+        <div className="hidden lg:block overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="bg-yellow-50 dark:bg-slate-800/90 text-xs font-black uppercase tracking-wider text-orange-950 dark:text-orange-300 border-b border-yellow-200 dark:border-slate-800">
               <tr>
@@ -249,6 +251,97 @@ export const InvoicesListView: React.FC<InvoicesListViewProps> = ({
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile & Tablet Card List */}
+        <div className="block lg:hidden divide-y divide-yellow-100 dark:divide-slate-800">
+          {filteredInvoices.length === 0 ? (
+            <div className="py-12 text-center text-slate-400 dark:text-slate-500 font-bold p-4">
+              <div className="w-12 h-12 rounded-3xl bg-yellow-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-2 text-amber-600 dark:text-amber-400">
+                <FileText className="w-6 h-6" />
+              </div>
+              No se encontraron facturas registradas.
+            </div>
+          ) : (
+            filteredInvoices.map((inv) => (
+              <div key={inv.id} className="p-4 sm:p-5 space-y-3 hover:bg-amber-50/40 dark:hover:bg-slate-800/40 transition-colors">
+                
+                {/* Header of card: Number & Status */}
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono font-black text-orange-950 dark:text-orange-300 bg-yellow-100 dark:bg-slate-800 px-3 py-1 rounded-xl text-xs border border-yellow-300 dark:border-slate-700">
+                      {inv.invoiceNumber}
+                    </span>
+                    <span
+                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black ${
+                        inv.status === 'pagada'
+                          ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40'
+                          : 'bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800/40'
+                      }`}
+                    >
+                      {inv.status === 'pagada' ? <CheckCircle2 className="w-3 h-3" /> : <Ban className="w-3 h-3" />}
+                      <span className="capitalize">{inv.status}</span>
+                    </span>
+                  </div>
+
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                    {new Date(inv.createdAt).toLocaleDateString('es-CO', {
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric'
+                    })}
+                  </span>
+                </div>
+
+                {/* Customer and Total */}
+                <div className="flex items-start justify-between gap-3 pt-1">
+                  <div>
+                    <span className="text-xs font-black text-slate-900 dark:text-white block">{inv.customerName}</span>
+                    <span className="text-[11px] text-slate-400 dark:text-slate-500 font-mono">Doc: {inv.customerDocument}</span>
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400 block mt-0.5">
+                      {inv.items.reduce((acc, i) => acc + i.quantity, 0)} ítems · Subtotal {ToyModel.formatCurrency(inv.subtotalBase)}
+                    </span>
+                  </div>
+
+                  <div className="text-right shrink-0">
+                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Total Factura</span>
+                    <span className="text-lg font-black text-emerald-600 dark:text-emerald-400 font-display">
+                      {ToyModel.formatCurrency(inv.grandTotal)}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Action buttons */}
+                <div className="flex items-center gap-2 pt-2 border-t border-yellow-100 dark:border-slate-800">
+                  <button
+                    onClick={() => onSelectInvoice(inv)}
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-black transition-all shadow-xs cursor-pointer"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>Ver Factura</span>
+                  </button>
+
+                  <button
+                    onClick={() => generateInvoicePdf(inv)}
+                    className="inline-flex items-center justify-center gap-1 px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black transition-all shadow-xs cursor-pointer"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>PDF</span>
+                  </button>
+
+                  {isStaffOrAdmin && (
+                    <button
+                      onClick={() => handleToggleStatus(inv.id, inv.status)}
+                      className="p-2 rounded-xl text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-slate-800 cursor-pointer"
+                      title="Cambiar estado"
+                    >
+                      <Ban className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

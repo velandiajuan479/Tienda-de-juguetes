@@ -109,16 +109,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
-      <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-[2rem] shadow-2xl border border-yellow-200 dark:border-slate-800 overflow-hidden max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+      <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-[2rem] shadow-2xl border border-yellow-200 dark:border-slate-800 overflow-hidden max-h-[92vh] flex flex-col">
         
         {/* Header */}
-        <div className="px-6 py-5 border-b border-yellow-200 dark:border-slate-800 flex items-center justify-between bg-yellow-50/80 dark:bg-slate-800/80">
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-yellow-200 dark:border-slate-800 flex items-center justify-between bg-yellow-50/80 dark:bg-slate-800/80">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-orange-500 flex items-center justify-center text-white font-bold shadow-xs">
+            <div className="w-8 h-8 rounded-xl bg-orange-500 flex items-center justify-center text-white font-bold shadow-xs shrink-0">
               {tab === 'forgot' ? <KeyRound className="w-4 h-4" /> : <Sparkles className="w-4 h-4" />}
             </div>
-            <h3 className="text-base font-black text-slate-900 dark:text-white font-display">
+            <h3 className="text-sm sm:text-base font-black text-slate-900 dark:text-white font-display">
               {tab === 'forgot'
                 ? 'Recuperar Contraseña'
                 : tab === 'login'
@@ -128,7 +128,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
           </div>
           <button 
             onClick={handleModalClose} 
-            className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-yellow-100 dark:hover:bg-slate-700 cursor-pointer"
+            className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-yellow-100 dark:hover:bg-slate-700 cursor-pointer transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -159,7 +159,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
             </button>
           </div>
         ) : (
-          <div className="px-6 py-2.5 bg-yellow-50/50 dark:bg-slate-800/50 border-b border-yellow-200 dark:border-slate-800 flex items-center justify-between">
+          <div className="px-4 sm:px-6 py-2.5 bg-yellow-50/50 dark:bg-slate-800/50 border-b border-yellow-200 dark:border-slate-800 flex items-center justify-between">
             <button
               type="button"
               id="btn-back-to-login-top"
@@ -171,16 +171,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
               className="text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-orange-600 dark:hover:text-orange-400 flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Volver a Iniciar Sesión</span>
+              <span>Volver</span>
             </button>
             <span className="text-[11px] font-bold text-amber-800 dark:text-amber-300 bg-amber-100/90 dark:bg-amber-950/60 px-2.5 py-0.5 rounded-lg border border-amber-200 dark:border-amber-800/50">
-              Seguridad de Cuenta
+              Seguridad
             </span>
           </div>
         )}
 
         {/* Form Body */}
-        <div className="p-6 space-y-4 overflow-y-auto flex-1">
+        <div className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
           {errorMessage && (
             errorMessage.includes('operation-not-allowed') ? (
               <div className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 text-slate-800 text-xs space-y-3 animate-in fade-in duration-200">

@@ -181,20 +181,20 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
       <div className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-[2rem] shadow-2xl border border-yellow-200 dark:border-slate-800 overflow-hidden max-h-[92vh] flex flex-col">
         
         {/* Header */}
-        <div className="px-6 py-4 border-b border-yellow-200 dark:border-slate-800 flex items-center justify-between bg-yellow-50/80 dark:bg-slate-800/80">
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-yellow-200 dark:border-slate-800 flex items-center justify-between bg-yellow-50/80 dark:bg-slate-800/80">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-2xl bg-orange-500 flex items-center justify-center text-white font-bold shadow-xs">
-              <User className="w-5 h-5" />
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-2xl bg-orange-500 flex items-center justify-center text-white font-bold shadow-xs shrink-0">
+              <User className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div>
-              <h3 className="text-base font-black text-slate-900 dark:text-white font-display">
+              <h3 className="text-sm sm:text-base font-black text-slate-900 dark:text-white font-display">
                 Perfil de Usuario
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 line-clamp-1">
                 Edita tus datos básicos, dirección y preferencias
               </p>
             </div>
@@ -209,37 +209,37 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
         </div>
 
         {/* Tab Selection */}
-        <div className="flex border-b border-yellow-200 dark:border-slate-800 text-xs font-black text-center bg-yellow-50/40 dark:bg-slate-800/40">
+        <div className="flex border-b border-yellow-200 dark:border-slate-800 text-[11px] sm:text-xs font-black text-center bg-yellow-50/40 dark:bg-slate-800/40">
           <button
             id="tab-profile-personal"
             type="button"
             onClick={() => setActiveTab('personal')}
-            className={`flex-1 py-3 px-4 flex items-center justify-center gap-2 transition-colors cursor-pointer ${
+            className={`flex-1 py-2.5 sm:py-3 px-3 sm:px-4 flex items-center justify-center gap-1.5 sm:gap-2 transition-colors cursor-pointer ${
               activeTab === 'personal'
                 ? 'text-orange-600 dark:text-orange-400 border-b-2 border-orange-500 bg-white dark:bg-slate-900'
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
             }`}
           >
-            <User className="w-4 h-4" />
+            <User className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span>Información Básica</span>
           </button>
           <button
             id="tab-profile-role"
             type="button"
             onClick={() => setActiveTab('role')}
-            className={`flex-1 py-3 px-4 flex items-center justify-center gap-2 transition-colors cursor-pointer ${
+            className={`flex-1 py-2.5 sm:py-3 px-3 sm:px-4 flex items-center justify-center gap-1.5 sm:gap-2 transition-colors cursor-pointer ${
               activeTab === 'role'
                 ? 'text-orange-600 dark:text-orange-400 border-b-2 border-orange-500 bg-white dark:bg-slate-900'
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
             }`}
           >
-            <ShieldCheck className="w-4 h-4" />
+            <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span>Rol y Seguridad</span>
           </button>
         </div>
 
         {/* Modal Scrollable Body */}
-        <div className="p-6 space-y-6 overflow-y-auto flex-1">
+        <div className="p-4 sm:p-6 space-y-5 sm:space-y-6 overflow-y-auto flex-1">
           
           {/* User Quick Info Summary Banner */}
           <div className="p-4 rounded-3xl bg-[#FFFBEB] dark:bg-slate-800/90 border border-yellow-200 dark:border-slate-700 flex items-center gap-3.5">

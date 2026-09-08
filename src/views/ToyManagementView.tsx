@@ -236,9 +236,11 @@ export const ToyManagementView: React.FC<ToyManagementViewProps> = ({
         </div>
       </div>
 
-      {/* Toys Table */}
+      {/* Toys Table & Mobile Cards */}
       <div className="bg-white dark:bg-slate-900 rounded-[2rem] border border-yellow-200/90 dark:border-slate-800 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+        
+        {/* Desktop Table */}
+        <div className="hidden lg:block overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="bg-yellow-50 dark:bg-slate-800/90 text-xs font-black uppercase tracking-wider text-orange-950 dark:text-orange-300 border-b border-yellow-200 dark:border-slate-800">
               <tr>
@@ -349,6 +351,7 @@ export const ToyManagementView: React.FC<ToyManagementViewProps> = ({
                           >
                             <Edit className="w-4 h-4" />
                           </button>
+
                           <button
                             id={`delete-table-btn-${toy.id}`}
                             onClick={() => setDeletingToyId(toy.id)}
@@ -365,6 +368,103 @@ export const ToyManagementView: React.FC<ToyManagementViewProps> = ({
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile & Tablet Card List View */}
+        <div className="block lg:hidden divide-y divide-yellow-100 dark:divide-slate-800">
+          {filteredToys.length === 0 ? (
+            <div className="p-8 text-center text-slate-400 dark:text-slate-500 font-bold text-sm">
+              No se encontraron juguetes registrados con ese filtro.
+            </div>
+          ) : (
+            filteredToys.map((toy) => {
+              const b = ToyModel.calculatePriceBreakdown(
+                toy.basePrice,
+                toy.taxRate,
+                toy.discountType,
+                toy.discountValue
+              );
+
+              return (
+                <div key={toy.id} className="p-4 sm:p-5 space-y-3 hover:bg-amber-50/40 dark:hover:bg-slate-800/40 transition-colors">
+                  <div className="flex items-start gap-3">
+                    <img
+                      src={toy.imageUrl}
+                      alt={toy.name}
+                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover bg-amber-50 dark:bg-slate-800 shrink-0 border border-yellow-200 dark:border-slate-700 shadow-xs"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <span className="px-2.5 py-0.5 rounded-full bg-yellow-100 dark:bg-slate-800 text-orange-900 dark:text-orange-300 text-[10px] font-bold">
+                          {toy.categoryName}
+                        </span>
+                        <span
+                          className={`px-2.5 py-0.5 rounded-full text-[10px] font-black ${
+                            toy.stock > 10
+                              ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300'
+                              : toy.stock > 0
+                              ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'
+                              : 'bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300'
+                          }`}
+                        >
+                          Stock: {toy.stock} un.
+                        </span>
+                      </div>
+                      <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white line-clamp-1">
+                        {toy.name}
+                      </h4>
+                      <p className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                        SKU: {toy.sku || 'N/A'} · +{toy.minAge} años
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Pricing grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-3 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800/80 border border-yellow-200/80 dark:border-slate-700/80 text-xs">
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Base</span>
+                      <span className="font-bold text-slate-700 dark:text-slate-200">{ToyModel.formatCurrency(b.basePrice)}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">IVA (+{b.taxRate}%)</span>
+                      <span className="font-bold text-indigo-600 dark:text-indigo-400">+{ToyModel.formatCurrency(b.taxAmount)}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Descuento</span>
+                      <span className="font-bold text-orange-600 dark:text-orange-400">
+                        {b.discountAmount > 0 ? `-${ToyModel.formatCurrency(b.discountAmount)}` : '0%'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Precio Final</span>
+                      <span className="font-black text-emerald-600 dark:text-emerald-400 text-sm font-display">
+                        {ToyModel.formatCurrency(b.finalPrice)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Actions bar */}
+                  <div className="flex items-center justify-end gap-2 pt-1">
+                    <button
+                      onClick={() => handleOpenEdit(toy)}
+                      className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl border border-yellow-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold hover:text-orange-600 dark:hover:text-orange-400 transition-colors shadow-xs cursor-pointer"
+                    >
+                      <Edit className="w-3.5 h-3.5" />
+                      <span>Editar</span>
+                    </button>
+                    <button
+                      onClick={() => setDeletingToyId(toy.id)}
+                      className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-xs font-bold transition-colors cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Eliminar</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
 

@@ -128,16 +128,17 @@ export const UserManagementView: React.FC<UserManagementViewProps> = ({ currentU
         </div>
       </div>
 
-      {/* Users List Table */}
+      {/* Users List Table & Mobile Cards */}
       <div className="bg-white dark:bg-slate-900 rounded-[2rem] border border-yellow-200/90 dark:border-slate-800 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-yellow-200 dark:border-slate-800 flex items-center justify-between bg-yellow-50/60 dark:bg-slate-800/60">
+        <div className="px-5 sm:px-6 py-4 border-b border-yellow-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-yellow-50/60 dark:bg-slate-800/60">
           <h3 className="text-base font-black text-slate-900 dark:text-white font-display">
             Usuarios Registrados ({users.length})
           </h3>
           <span className="text-xs text-orange-950 dark:text-orange-300 font-bold">Autenticación Firebase Auth & Firestore</span>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="bg-yellow-50 dark:bg-slate-800/90 text-xs font-black uppercase tracking-wider text-orange-950 dark:text-orange-300 border-b border-yellow-200 dark:border-slate-800">
               <tr>
@@ -198,6 +199,51 @@ export const UserManagementView: React.FC<UserManagementViewProps> = ({ currentU
               })}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Cards View */}
+        <div className="block md:hidden divide-y divide-yellow-100 dark:divide-slate-800">
+          {users.map((user) => {
+            const badge = UserModel.getRoleBadge(user.role);
+
+            return (
+              <div key={user.id} className="p-4 space-y-3 hover:bg-amber-50/40 dark:hover:bg-slate-800/40 transition-colors">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-10 h-10 rounded-2xl bg-orange-500 text-white flex items-center justify-center font-black text-xs shadow-xs shrink-0">
+                      {user.displayName.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <span className="font-black text-slate-900 dark:text-white block text-sm">{user.displayName}</span>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium block truncate max-w-[200px]">{user.email}</span>
+                    </div>
+                  </div>
+
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black shrink-0 ${badge.bg}`}>
+                    {badge.label}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500">
+                  <span className="font-mono">UID: {user.uid?.slice(0, 8)}...</span>
+                  <span>Registrado: {new Date(user.createdAt).toLocaleDateString('es-CO')}</span>
+                </div>
+
+                <div className="flex items-center justify-between gap-2 pt-2 border-t border-yellow-100 dark:border-slate-800">
+                  <span className="text-xs font-bold text-slate-600 dark:text-slate-300">Asignar Rol:</span>
+                  <select
+                    value={user.role}
+                    onChange={(e) => handleRoleChange(user.id, e.target.value as UserRole)}
+                    className="px-3 py-1.5 rounded-2xl border border-yellow-300 dark:border-slate-700 text-xs font-bold text-slate-800 dark:text-slate-100 bg-[#FFFBEB] dark:bg-slate-800 shadow-xs focus:outline-orange-500 cursor-pointer"
+                  >
+                    <option value="cliente">Cliente</option>
+                    <option value="empleado">Empleado</option>
+                    <option value="admin">Administrador</option>
+                  </select>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

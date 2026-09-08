@@ -54,21 +54,21 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
       >
         
         {/* Modal Action Bar (Sticky at top, hidden when printing) */}
-        <div className="px-5 sm:px-6 py-4 border-b border-yellow-200 dark:border-slate-800 flex items-center justify-between bg-yellow-50/95 dark:bg-slate-800/95 shrink-0 z-10 print:hidden">
+        <div className="px-4 sm:px-6 py-3.5 border-b border-yellow-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 bg-yellow-50/95 dark:bg-slate-800/95 shrink-0 z-10 print:hidden">
           <div className="flex items-center gap-2">
-            <span className="px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs font-black flex items-center gap-1 border border-emerald-200 dark:border-emerald-800/40">
+            <span className="px-2.5 sm:px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-[11px] sm:text-xs font-black flex items-center gap-1 border border-emerald-200 dark:border-emerald-800/40">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>Factura Emitida</span>
+              <span>Emitida</span>
             </span>
             <span className="text-xs font-mono font-bold text-orange-950 dark:text-orange-300">{invoice.invoiceNumber}</span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <button
               id="btn-download-pdf-invoice"
               onClick={handleDownloadPdf}
               disabled={isGeneratingPdf}
-              className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black transition-all shadow-xs disabled:opacity-50 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black transition-all shadow-xs disabled:opacity-50 cursor-pointer"
               title="Descargar factura en formato PDF (1 página oficial)"
             >
               {isGeneratingPdf ? (
@@ -79,14 +79,14 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
               ) : (
                 <>
                   <Download className="w-3.5 h-3.5" />
-                  <span>Descargar Factura PDF</span>
+                  <span>PDF</span>
                 </>
               )}
             </button>
 
             <button
               onClick={handlePrint}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-black transition-all shadow-xs cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-black transition-all shadow-xs cursor-pointer"
               title="Imprimir factura"
             >
               <Printer className="w-3.5 h-3.5" />
@@ -106,7 +106,7 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
         {/* Invoice Body with dedicated vertical scrollbar */}
         <div 
           id="invoice-printable-area" 
-          className="overflow-y-auto flex-1 p-6 sm:p-10 text-slate-800 dark:text-slate-200 space-y-6 sm:space-y-8 bg-white dark:bg-slate-900 print:overflow-visible print:p-2 print:bg-white print:text-slate-800"
+          className="overflow-y-auto flex-1 p-4 sm:p-8 lg:p-10 text-slate-800 dark:text-slate-200 space-y-5 sm:space-y-8 bg-white dark:bg-slate-900 print:overflow-visible print:p-2 print:bg-white print:text-slate-800"
         >
           
           {/* Header & Company Info */}
@@ -180,8 +180,8 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
             </div>
           </div>
 
-          {/* Line Items Table */}
-          <div className="overflow-x-auto">
+          {/* Line Items Table (Desktop & Print) */}
+          <div className="hidden sm:block print:block overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="bg-yellow-50 dark:bg-slate-800 uppercase tracking-wider font-black text-orange-950 dark:text-orange-300 border-y border-yellow-200 dark:border-slate-700">
                 <tr>
@@ -219,6 +219,51 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
                 ))}
               </tbody>
             </table>
+          </div>
+
+          {/* Line Items Cards (Mobile Screen Only) */}
+          <div className="block sm:hidden print:hidden space-y-3">
+            <span className="text-[10px] font-black uppercase tracking-wider text-orange-950 dark:text-orange-300 block">
+              Ítems Comprados ({invoice.items.length}):
+            </span>
+            <div className="divide-y divide-yellow-100 dark:divide-slate-800 rounded-2xl border border-yellow-200 dark:border-slate-800 overflow-hidden bg-yellow-50/20 dark:bg-slate-800/30">
+              {invoice.items.map((item, idx) => (
+                <div key={idx} className="p-3.5 space-y-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <h5 className="font-bold text-xs text-slate-900 dark:text-white line-clamp-1">{item.toyName}</h5>
+                      <p className="text-[10px] font-mono text-slate-400 dark:text-slate-500">{item.sku} · {item.categoryName}</p>
+                    </div>
+                    <span className="px-2.5 py-0.5 rounded-full bg-yellow-100 dark:bg-slate-800 text-orange-950 dark:text-orange-300 text-[10px] font-black shrink-0">
+                      Cant: {item.quantity}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-1.5 text-[11px] pt-1">
+                    <div>
+                      <span className="text-slate-400 block text-[10px]">Base unit.:</span>
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">{ToyModel.formatCurrency(item.unitBasePrice)}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[10px]">IVA (+{item.taxRate}%):</span>
+                      <span className="font-semibold text-indigo-600 dark:text-indigo-400">+{ToyModel.formatCurrency(item.totalTax)}</span>
+                    </div>
+                    {item.totalDiscount > 0 && (
+                      <div>
+                        <span className="text-slate-400 block text-[10px]">Descuento:</span>
+                        <span className="font-semibold text-orange-600 dark:text-orange-400">-{ToyModel.formatCurrency(item.totalDiscount)}</span>
+                      </div>
+                    )}
+                    <div className={item.totalDiscount > 0 ? '' : 'col-span-2'}>
+                      <span className="text-slate-400 block text-[10px]">Total ítem:</span>
+                      <span className="font-black text-emerald-600 dark:text-emerald-400 text-xs font-display">
+                        {ToyModel.formatCurrency(item.totalFinal)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Totals Summary Card */}

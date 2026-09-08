@@ -120,8 +120,8 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
       </div>
 
       {/* Filter Toolbar (Vibrant Styling) */}
-      <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-5 border border-yellow-200/90 dark:border-slate-800 shadow-sm mb-8 space-y-4 transition-colors">
-        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-4 sm:p-5 border border-yellow-200/90 dark:border-slate-800 shadow-sm mb-6 sm:mb-8 space-y-3 sm:space-y-4 transition-colors">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 sm:gap-4">
           
           {/* Search bar */}
           <div className="relative flex-1">
@@ -132,7 +132,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
               placeholder="Buscar juguetes por nombre, código SKU o categoría..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-sm font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-orange-500 focus:bg-white dark:focus:bg-slate-800 transition-all"
+              className="w-full pl-11 pr-4 py-2.5 sm:py-3 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-orange-500 focus:bg-white dark:focus:bg-slate-800 transition-all"
             />
             {searchQuery && (
               <button
@@ -145,8 +145,8 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
           </div>
 
           {/* Sort selector */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 text-xs font-black text-slate-600 dark:text-slate-400 whitespace-nowrap">
+          <div className="flex items-center justify-between md:justify-end gap-2 sm:gap-3 shrink-0">
+            <div className="flex items-center gap-1.5 text-xs font-black text-slate-600 dark:text-slate-400 whitespace-nowrap">
               <ArrowUpDown className="w-3.5 h-3.5 text-orange-500" />
               <span>Ordenar:</span>
             </div>
@@ -154,7 +154,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
               id="catalog-sort-select"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="px-4 py-2.5 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 focus:outline-orange-500"
+              className="flex-1 md:flex-initial px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 focus:outline-orange-500"
             >
               <option value="featured">Destacados</option>
               <option value="price-asc">Menor Precio Final</option>
@@ -166,11 +166,11 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
         </div>
 
         {/* Category Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1.5 -mx-1 px-1 sm:mx-0 sm:px-0 scrollbar-none">
           <button
             id="cat-pill-all"
             onClick={() => setSelectedCategory('all')}
-            className={`px-4 py-2 rounded-2xl text-xs font-black whitespace-nowrap transition-all cursor-pointer ${
+            className={`px-3.5 sm:px-4 py-2 rounded-2xl text-xs font-black whitespace-nowrap transition-all cursor-pointer shrink-0 ${
               selectedCategory === 'all'
                 ? 'bg-orange-500 text-white shadow-md'
                 : 'bg-yellow-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-yellow-100 dark:hover:bg-slate-700 border border-yellow-200 dark:border-slate-700'
@@ -190,7 +190,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                 key={cat.id}
                 id={`cat-pill-${cat.id}`}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`px-4 py-2 rounded-2xl text-xs font-black whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
+                className={`px-3.5 sm:px-4 py-2 rounded-2xl text-xs font-black whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer shrink-0 ${
                   isSelected
                     ? 'bg-orange-500 text-white shadow-md'
                     : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-yellow-50 dark:hover:bg-slate-700 border border-yellow-200 dark:border-slate-700'
@@ -345,25 +345,25 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-yellow-200/70 dark:border-slate-700">
-                    <div>
+                  <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 pt-2 border-t border-yellow-200/70 dark:border-slate-700">
+                    <div className="min-w-0">
                       <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
                         Precio Final
                       </span>
                       <div className="flex items-baseline gap-1.5">
-                        <span className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 font-display">
+                        <span className="text-lg sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 font-display">
                           {ToyModel.formatCurrency(breakdown.finalPrice)}
                         </span>
                       </div>
                     </div>
 
                     {/* Action Buttons with 3D tactile emerald button */}
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1.5 shrink-0 ml-auto">
                       {canManageToys && onEditToy && (
                         <button
                           id={`edit-toy-btn-${toy.id}`}
                           onClick={() => onEditToy(toy)}
-                          className="p-2.5 rounded-xl border border-yellow-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-slate-700 transition-colors shadow-xs cursor-pointer"
+                          className="p-2 sm:p-2.5 rounded-xl border border-yellow-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-slate-700 transition-colors shadow-xs cursor-pointer"
                           title="Editar Juguete (Rol Empleado/Admin)"
                         >
                           <Edit className="w-4 h-4" />
@@ -374,7 +374,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                         id={`add-to-cart-${toy.id}`}
                         disabled={toy.stock <= 0}
                         onClick={() => handleAdd(toy)}
-                        className={`flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-xs font-black transition-all cursor-pointer ${
+                        className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl text-xs font-black transition-all cursor-pointer ${
                           toy.stock <= 0
                             ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
                             : isAdded
@@ -405,9 +405,9 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
 
       {/* Toy Detail Modal */}
       {selectedToyDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-[2rem] shadow-2xl border border-yellow-200 dark:border-slate-800 overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
-            <div className="w-full md:w-1/2 h-64 md:h-auto bg-amber-50 dark:bg-slate-800 relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-[2rem] shadow-2xl border border-yellow-200 dark:border-slate-800 overflow-hidden flex flex-col md:flex-row max-h-[92vh]">
+            <div className="w-full md:w-1/2 h-48 sm:h-64 md:h-auto bg-amber-50 dark:bg-slate-800 relative shrink-0">
               <img
                 src={selectedToyDetail.imageUrl}
                 alt={selectedToyDetail.name}
@@ -419,22 +419,22 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
               </span>
             </div>
 
-            <div className="p-6 md:p-8 flex-1 flex flex-col justify-between overflow-y-auto">
+            <div className="p-5 sm:p-6 md:p-8 flex-1 flex flex-col justify-between overflow-y-auto">
               <div>
                 <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-mono mb-2">
                   <span>SKU: {selectedToyDetail.sku}</span>
                   <span>Edad: +{selectedToyDetail.minAge} años</span>
                 </div>
 
-                <h2 className="text-2xl font-black text-slate-900 dark:text-white font-display">
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-display">
                   {selectedToyDetail.name}
                 </h2>
-                <p className="text-sm text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">
                   {selectedToyDetail.description}
                 </p>
 
                 {/* Calculation Breakdown Box */}
-                <div className="mt-5 p-4 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-200 dark:border-slate-700">
+                <div className="mt-4 sm:mt-5 p-3.5 sm:p-4 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-200 dark:border-slate-700">
                   <span className="text-[11px] font-black uppercase tracking-wider text-orange-900 dark:text-orange-300 block mb-2">
                     Detalle de Precio
                   </span>
@@ -463,8 +463,8 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                           </span>
                         </div>
                         <div className="pt-2 border-t border-yellow-300 dark:border-slate-700 flex justify-between items-baseline">
-                          <span className="font-black text-slate-900 dark:text-white text-sm">Precio Final:</span>
-                          <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-display">
+                          <span className="font-black text-slate-900 dark:text-white text-xs sm:text-sm">Precio Final:</span>
+                          <span className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 font-display">
                             {ToyModel.formatCurrency(b.finalPrice)}
                           </span>
                         </div>
@@ -474,10 +474,10 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                 </div>
               </div>
 
-              <div className="mt-6 flex items-center justify-end gap-3">
+              <div className="mt-5 sm:mt-6 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3">
                 <button
                   onClick={() => setSelectedToyDetail(null)}
-                  className="px-4 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
+                  className="px-4 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer text-center"
                 >
                   Cerrar
                 </button>
@@ -486,7 +486,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                     handleAdd(selectedToyDetail);
                     setSelectedToyDetail(null);
                   }}
-                  className="px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black shadow-[0_4px_0_0_rgba(16,185,129,1)] active:translate-y-1 active:shadow-none transition-all cursor-pointer"
+                  className="px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black shadow-[0_4px_0_0_rgba(16,185,129,1)] active:translate-y-1 active:shadow-none transition-all cursor-pointer text-center"
                 >
                   Agregar al Carrito
                 </button>

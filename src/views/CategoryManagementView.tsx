@@ -132,7 +132,7 @@ export const CategoryManagementView: React.FC<CategoryManagementViewProps> = ({
       </div>
 
       {/* Grid of Categories */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {categories.map((cat) => {
           const toyCount = toys.filter((t) => t.categoryId === cat.id).length;
 
@@ -140,7 +140,7 @@ export const CategoryManagementView: React.FC<CategoryManagementViewProps> = ({
             <div
               key={cat.id}
               id={`category-card-${cat.id}`}
-              className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 border border-yellow-200/90 dark:border-slate-800 hover:border-orange-300 dark:hover:border-orange-500 shadow-sm hover:shadow-xl transition-all flex flex-col justify-between"
+              className="bg-white dark:bg-slate-900 rounded-[2rem] p-5 sm:p-6 border border-yellow-200/90 dark:border-slate-800 hover:border-orange-300 dark:hover:border-orange-500 shadow-sm hover:shadow-xl transition-all flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-start justify-between gap-3 mb-4">
@@ -188,9 +188,9 @@ export const CategoryManagementView: React.FC<CategoryManagementViewProps> = ({
 
       {/* Category Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
           <div className="bg-white dark:bg-slate-900 w-full max-w-2xl max-h-[92vh] flex flex-col rounded-[2rem] shadow-2xl border border-yellow-200 dark:border-slate-800 overflow-hidden">
-            <div className="px-6 py-4 border-b border-yellow-200 dark:border-slate-800 flex items-center justify-between bg-yellow-50/70 dark:bg-slate-800/80 shrink-0">
+            <div className="px-5 sm:px-6 py-4 border-b border-yellow-200 dark:border-slate-800 flex items-center justify-between bg-yellow-50/70 dark:bg-slate-800/80 shrink-0">
               <h3 className="text-base font-black text-slate-900 dark:text-white font-display">
                 {editingId ? 'Editar Categoría' : 'Crear Nueva Categoría'}
               </h3>
@@ -199,7 +199,7 @@ export const CategoryManagementView: React.FC<CategoryManagementViewProps> = ({
               </button>
             </div>
 
-            <form onSubmit={handleSave} className="p-6 space-y-4 overflow-y-auto">
+            <form onSubmit={handleSave} className="p-4 sm:p-6 space-y-4 overflow-y-auto">
               {errorMessage && (
                 <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold">
                   {errorMessage}
@@ -232,7 +232,7 @@ export const CategoryManagementView: React.FC<CategoryManagementViewProps> = ({
               {/* Color Selection */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">Color Distintivo</label>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   {PRESET_COLORS.map((col) => (
                     <button
                       key={col}

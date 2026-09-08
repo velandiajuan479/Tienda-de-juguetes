@@ -208,17 +208,17 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {/* Auth / Profile Button */}
             {currentUser ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <button
                   id="profile-button"
                   onClick={onOpenProfile}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-white dark:bg-slate-800 text-orange-600 dark:text-amber-300 hover:bg-orange-50 dark:hover:bg-slate-700 border border-transparent dark:border-slate-700 font-black text-xs shadow-md transition-all cursor-pointer"
+                  className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-2xl bg-white dark:bg-slate-800 text-orange-600 dark:text-amber-300 hover:bg-orange-50 dark:hover:bg-slate-700 border border-transparent dark:border-slate-700 font-black text-xs shadow-md transition-all cursor-pointer"
                   title="Abrir Mi Perfil"
                 >
-                  <div className="w-6 h-6 rounded-full bg-orange-500 text-white flex items-center justify-center font-black text-[10px]">
+                  <div className="w-6 h-6 rounded-full bg-orange-500 text-white flex items-center justify-center font-black text-[10px] shrink-0">
                     {currentUser.displayName?.substring(0, 2).toUpperCase() || 'US'}
                   </div>
-                  <span className="hidden md:inline truncate max-w-[100px]">
+                  <span className="hidden sm:inline truncate max-w-[90px] md:max-w-[120px]">
                     {currentUser.displayName?.split(' ')[0]}
                   </span>
                 </button>
@@ -228,6 +228,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   onClick={onSignOut}
                   className="p-2 rounded-xl text-orange-100 dark:text-slate-400 hover:text-white hover:bg-orange-600 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                   title="Cerrar sesión"
+                  aria-label="Cerrar sesión"
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
@@ -236,39 +237,48 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 id="sign-in-button"
                 onClick={onOpenAuth}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-white dark:bg-slate-800 hover:bg-orange-50 dark:hover:bg-slate-700 text-orange-600 dark:text-amber-300 border border-transparent dark:border-slate-700 text-xs font-black transition-all shadow-md cursor-pointer"
+                className="flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-2xl bg-white dark:bg-slate-800 hover:bg-orange-50 dark:hover:bg-slate-700 text-orange-600 dark:text-amber-300 border border-transparent dark:border-slate-700 text-xs font-black transition-all shadow-md cursor-pointer shrink-0"
               >
-                <LogIn className="w-3.5 h-3.5" />
-                <span>Ingresar / Crear Cuenta</span>
+                <LogIn className="w-3.5 h-3.5 shrink-0" />
+                <span>Ingresar<span className="hidden sm:inline"> / Registro</span></span>
               </button>
             )}
 
-            {/* Mobile Menu Toggle Button */}
+            {/* Mobile / Tablet Menu Toggle Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-2xl bg-orange-600 dark:bg-slate-800 text-white border border-transparent dark:border-slate-700 cursor-pointer"
+              className="lg:hidden p-2 rounded-2xl bg-orange-600 dark:bg-slate-800 text-white border border-transparent dark:border-slate-700 cursor-pointer shrink-0"
+              aria-label="Abrir menú de navegación"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Navigation Dropdown */}
+        {/* Mobile & Tablet Navigation Dropdown */}
         {mobileMenuOpen && (
-          <div className="lg:hidden py-4 border-t border-orange-400/40 dark:border-slate-800 space-y-2">
-            {currentUser && (
+          <div className="lg:hidden py-4 border-t border-orange-400/40 dark:border-slate-800 space-y-2 animate-in fade-in slide-in-from-top-2 duration-150">
+            {currentUser ? (
               <div 
                 onClick={() => { onOpenProfile(); setMobileMenuOpen(false); }}
-                className="p-3 bg-orange-600 dark:bg-slate-800 rounded-2xl flex items-center justify-between cursor-pointer mb-2 border border-transparent dark:border-slate-700"
+                className="p-3 bg-orange-600 dark:bg-slate-800 rounded-2xl flex items-center justify-between cursor-pointer mb-2 border border-transparent dark:border-slate-700 hover:bg-orange-700 dark:hover:bg-slate-700 transition-colors"
               >
-                <div className="flex items-center gap-2">
-                  <UserIcon className="w-4 h-4 text-orange-200 dark:text-amber-300" />
-                  <span className="text-xs font-bold text-white">{currentUser.displayName}</span>
+                <div className="flex items-center gap-2 min-w-0">
+                  <UserIcon className="w-4 h-4 text-orange-200 dark:text-amber-300 shrink-0" />
+                  <span className="text-xs font-bold text-white truncate">{currentUser.displayName}</span>
                 </div>
-                <span className="text-xs font-black bg-white dark:bg-slate-700 text-orange-600 dark:text-amber-300 px-2 py-0.5 rounded-full">
+                <span className="text-xs font-black bg-white dark:bg-slate-700 text-orange-600 dark:text-amber-300 px-2.5 py-0.5 rounded-full shrink-0 ml-2">
                   {roleBadge.label}
                 </span>
               </div>
+            ) : (
+              <button
+                onClick={() => { onOpenAuth(); setMobileMenuOpen(false); }}
+                className="w-full p-3 bg-white dark:bg-slate-800 text-orange-600 dark:text-amber-300 rounded-2xl flex items-center justify-center gap-2 font-black text-xs cursor-pointer mb-2 shadow-sm"
+              >
+                <LogIn className="w-4 h-4" />
+                <span>Ingresar / Registrar Cuenta</span>
+              </button>
             )}
 
             {/* Dark Mode toggle in mobile menu */}
