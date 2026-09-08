@@ -5,11 +5,13 @@ import {
   signOut, 
   onAuthStateChanged,
   sendPasswordResetEmail,
+  updateProfile,
+  updateEmail,
   User as FirebaseUser 
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc, collection, getDocs } from 'firebase/firestore';
 import { auth, googleProvider, db } from '../services/firebase';
-import { UserProfile, UserRole } from '../types';
+import { UserProfile, UserRole, PaymentMethod } from '../types';
 import { UserModel } from '../models/UserModel';
 
 const USERS_COLLECTION = 'users';
@@ -293,6 +295,93 @@ export class AuthController {
       await updateDoc(doc(db, USERS_COLLECTION, userId), { role: targetRole });
     } catch (err) {
       console.warn('Firestore role update:', err);
+    }
+
+    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(updatedProfile));
+    return updatedProfile;
+  }
+
+  /**
+   * Update user's personal profile (Name, Email, Address, Payment Method, Phone)
+   */
+  static async updateUserProfile(
+    userId: string,
+    data: {
+      displayName: string;
+      email: string;
+      address?: string;
+      defaultPaymentMethod?: PaymentMethod;
+      phone?: string;
+    },
+    currentProfile: UserProfile | null
+  ): Promise<UserProfile> {
+    const trimmedName = data.displayName.trim();
+    const trimmedEmail = data.email.trim();
+    const trimmedAddress = data.address?.trim() || '';
+    const trimmedPhone = data.phone?.trim() || '';
+    const paymentMethod: PaymentMethod = data.defaultPaymentMethod || 'tarjeta';
+
+    if (!trimmedName) {
+      throw new Error('El nombre no puede estar vacío.');
+    }
+    if (!trimmedEmail || !trimmedEmail.includes('@')) {
+      throw new Error('Ingresa un correo electrónico válido.');
+    }
+
+    // Attempt updating Firebase Auth user if matching logged-in user
+    if (auth.currentUser && auth.currentUser.uid === userId) {
+      if (trimmedName !== auth.currentUser.displayName) {
+        try {
+          await updateProfile(auth.currentUser, { displayName: trimmedName });
+        } catch (e) {
+          console.warn('Could not update Firebase Auth displayName:', e);
+        }
+      }
+      if (trimmedEmail !== auth.currentUser.email) {
+        try {
+          await updateEmail(auth.currentUser, trimmedEmail);
+        } catch (e: any) {
+          console.warn('Could not update Firebase Auth email directly:', e);
+        }
+      }
+    }
+
+    const updatedProfile: UserProfile = {
+      ...(currentProfile || {
+        id: userId,
+        uid: userId,
+        role: 'cliente',
+        createdAt: new Date().toISOString(),
+      }),
+      id: userId,
+      uid: userId,
+      displayName: trimmedName,
+      email: trimmedEmail,
+      address: trimmedAddress,
+      defaultPaymentMethod: paymentMethod,
+      phone: trimmedPhone,
+      role: currentProfile?.role || 'cliente',
+      createdAt: currentProfile?.createdAt || new Date().toISOString(),
+    };
+
+    // Update Firestore document
+    try {
+      const userRef = doc(db, USERS_COLLECTION, userId);
+      await setDoc(
+        userRef,
+        {
+          displayName: trimmedName,
+          email: trimmedEmail,
+          address: trimmedAddress,
+          defaultPaymentMethod: paymentMethod,
+          phone: trimmedPhone,
+          role: updatedProfile.role,
+          updatedAt: new Date().toISOString(),
+        },
+        { merge: true }
+      );
+    } catch (err) {
+      console.warn('Firestore user profile update:', err);
     }
 
     localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(updatedProfile));

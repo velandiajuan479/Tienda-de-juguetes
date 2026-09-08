@@ -319,11 +319,15 @@ export default function App() {
         }}
       />
 
-      {/* Profile & Role Upgrade Modal with Passwords */}
+      {/* Profile & Settings Modal */}
       <ProfileModal
         isOpen={isProfileOpen}
         onClose={() => setIsProfileOpen(false)}
         currentUser={currentUser}
+        onUserUpdated={(updatedUser) => {
+          setCurrentUser(updatedUser);
+          showToast('¡Datos de usuario actualizados con éxito!');
+        }}
         onRoleUpdated={handleRoleUpdated}
         onSignOut={handleSignOut}
       />

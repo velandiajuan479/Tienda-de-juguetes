@@ -50,9 +50,9 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   const [customerName, setCustomerName] = useState(currentUser?.displayName || '');
   const [customerEmail, setCustomerEmail] = useState(currentUser?.email || '');
   const [customerDocument, setCustomerDocument] = useState('1094829104');
-  const [customerPhone, setCustomerPhone] = useState('+57 312 458 9921');
-  const [customerAddress, setCustomerAddress] = useState('Calle 123 # 45-67');
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('tarjeta');
+  const [customerPhone, setCustomerPhone] = useState(currentUser?.phone || '+57 312 458 9921');
+  const [customerAddress, setCustomerAddress] = useState(currentUser?.address || 'Calle 123 # 45-67');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(currentUser?.defaultPaymentMethod || 'tarjeta');
   const [notes, setNotes] = useState('Factura generada en línea');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -60,8 +60,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   // Synchronize with currentUser profile when opened
   React.useEffect(() => {
     if (currentUser) {
-      if (!customerName) setCustomerName(currentUser.displayName);
-      if (!customerEmail) setCustomerEmail(currentUser.email);
+      if (currentUser.displayName) setCustomerName(currentUser.displayName);
+      if (currentUser.email) setCustomerEmail(currentUser.email);
+      if (currentUser.address) setCustomerAddress(currentUser.address);
+      if (currentUser.defaultPaymentMethod) setPaymentMethod(currentUser.defaultPaymentMethod);
+      if (currentUser.phone) setCustomerPhone(currentUser.phone);
     }
   }, [currentUser, isOpen]);
 
