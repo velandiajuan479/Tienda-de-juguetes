@@ -18,7 +18,8 @@ import {
   Phone,
   Save,
   CheckCircle2,
-  Sparkles
+  Sparkles,
+  FileText
 } from 'lucide-react';
 import { UserProfile, UserRole, PaymentMethod } from '../types';
 import { UserModel } from '../models/UserModel';
@@ -47,6 +48,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   // Personal Info Form State
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
+  const [document, setDocument] = useState('');
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [defaultPaymentMethod, setDefaultPaymentMethod] = useState<PaymentMethod>('tarjeta');
@@ -67,6 +69,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
     if (currentUser) {
       setDisplayName(currentUser.displayName || '');
       setEmail(currentUser.email || '');
+      setDocument(currentUser.document || '');
       setAddress(currentUser.address || '');
       setPhone(currentUser.phone || '');
       setDefaultPaymentMethod(currentUser.defaultPaymentMethod || 'tarjeta');
@@ -104,6 +107,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
         {
           displayName,
           email,
+          document,
           address,
           phone,
           defaultPaymentMethod,
@@ -250,6 +254,11 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                 <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-black border ${roleBadge.bg} ${roleBadge.border}`}>
                   {roleBadge.label}
                 </span>
+                {currentUser.document && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-yellow-100/80 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border border-yellow-300 dark:border-slate-600">
+                    C.C. {currentUser.document}
+                  </span>
+                )}
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-300 font-medium truncate mt-0.5">
                 {currentUser.email}
@@ -275,22 +284,41 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                 </div>
               )}
 
-              {/* Nombre Completo */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Nombre Completo *
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-400" />
-                  <input
-                    id="input-profile-name"
-                    type="text"
-                    required
-                    placeholder="Ej. Juan Pérez"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    className="w-full pl-10 pr-3 py-2.5 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-xs font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-orange-500"
-                  />
+              {/* Nombre Completo y Documento / Cédula */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Nombre Completo *
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-400" />
+                    <input
+                      id="input-profile-name"
+                      type="text"
+                      required
+                      placeholder="Ej. Juan Pérez"
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      className="w-full pl-10 pr-3 py-2.5 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-xs font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-orange-500"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Documento / Cédula / NIT
+                  </label>
+                  <div className="relative">
+                    <FileText className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-400" />
+                    <input
+                      id="input-profile-document"
+                      type="text"
+                      placeholder="Ej. 1094829104"
+                      value={document}
+                      onChange={(e) => setDocument(e.target.value)}
+                      className="w-full pl-10 pr-3 py-2.5 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-xs font-mono font-bold text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-orange-500"
+                    />
+                  </div>
                 </div>
               </div>
 

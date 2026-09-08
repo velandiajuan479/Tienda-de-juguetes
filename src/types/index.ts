@@ -17,6 +17,7 @@ export interface UserProfile {
   displayName: string;
   role: UserRole;
   photoURL?: string;
+  document?: string;
   address?: string;
   defaultPaymentMethod?: PaymentMethod;
   phone?: string;

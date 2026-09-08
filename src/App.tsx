@@ -300,6 +300,10 @@ export default function App() {
           setIsCartOpen(false);
           setIsAuthOpen(true);
         }}
+        onOpenProfile={() => {
+          setIsCartOpen(false);
+          setIsProfileOpen(true);
+        }}
       />
 
       {/* Invoice Detail Modal with PDF Download */}

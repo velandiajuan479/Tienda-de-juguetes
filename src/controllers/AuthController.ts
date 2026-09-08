@@ -302,13 +302,14 @@ export class AuthController {
   }
 
   /**
-   * Update user's personal profile (Name, Email, Address, Payment Method, Phone)
+   * Update user's personal profile (Name, Email, Document/Cédula, Address, Payment Method, Phone)
    */
   static async updateUserProfile(
     userId: string,
     data: {
       displayName: string;
       email: string;
+      document?: string;
       address?: string;
       defaultPaymentMethod?: PaymentMethod;
       phone?: string;
@@ -317,6 +318,7 @@ export class AuthController {
   ): Promise<UserProfile> {
     const trimmedName = data.displayName.trim();
     const trimmedEmail = data.email.trim();
+    const trimmedDocument = data.document?.trim() || '';
     const trimmedAddress = data.address?.trim() || '';
     const trimmedPhone = data.phone?.trim() || '';
     const paymentMethod: PaymentMethod = data.defaultPaymentMethod || 'tarjeta';
@@ -357,6 +359,7 @@ export class AuthController {
       uid: userId,
       displayName: trimmedName,
       email: trimmedEmail,
+      document: trimmedDocument,
       address: trimmedAddress,
       defaultPaymentMethod: paymentMethod,
       phone: trimmedPhone,
@@ -372,6 +375,7 @@ export class AuthController {
         {
           displayName: trimmedName,
           email: trimmedEmail,
+          document: trimmedDocument,
           address: trimmedAddress,
           defaultPaymentMethod: paymentMethod,
           phone: trimmedPhone,
