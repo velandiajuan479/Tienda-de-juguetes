@@ -370,231 +370,241 @@ export const ToyManagementView: React.FC<ToyManagementViewProps> = ({
 
       {/* Create / Edit Toy Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-150">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-3xl rounded-[2rem] shadow-2xl border border-yellow-200 dark:border-slate-800 overflow-hidden my-8">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-2xl sm:max-w-3xl rounded-3xl shadow-2xl border border-yellow-200 dark:border-slate-800 overflow-hidden max-h-[90vh] flex flex-col">
             
-            <div className="px-6 py-4 border-b border-yellow-200 dark:border-slate-800 flex items-center justify-between bg-yellow-50/70 dark:bg-slate-800/80">
+            {/* Modal Header */}
+            <div className="shrink-0 px-5 sm:px-6 py-3.5 border-b border-yellow-200 dark:border-slate-800 flex items-center justify-between bg-yellow-50/80 dark:bg-slate-800/80">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-orange-500 text-white font-bold rotate-3">
+                <div className="p-2 rounded-xl bg-orange-500 text-white font-bold rotate-3 shadow-xs">
                   <Sparkles className="w-4 h-4" />
                 </div>
-                <h3 className="text-lg font-black text-slate-900 dark:text-white font-display">
-                  {editingId ? 'Editar Juguete' : 'Registrar Nuevo Juguete'}
-                </h3>
+                <div>
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white font-display">
+                    {editingId ? 'Editar Juguete' : 'Registrar Nuevo Juguete'}
+                  </h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Ingresa las especificaciones, imagen y fórmula de precio
+                  </p>
+                </div>
               </div>
               <button
+                type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSave} className="p-6 space-y-5">
-              {errorMessage && (
-                <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/50 text-rose-700 dark:text-rose-300 text-xs font-bold flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 shrink-0" />
-                  <span>{errorMessage}</span>
-                </div>
-              )}
+            {/* Modal Form with Scrollable Content and Fixed Footer */}
+            <form onSubmit={handleSave} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+              <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 pr-3.5 sm:pr-5">
+                {errorMessage && (
+                  <div className="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/50 text-rose-700 dark:text-rose-300 text-xs font-bold flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 shrink-0" />
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
 
-              {/* General Info */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Nombre del Juguete *</label>
-                  <input
-                    id="toy-form-name"
-                    type="text"
-                    required
-                    placeholder="Ej. Castillo Legendario LEGO"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full px-4 py-2 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-sm font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-orange-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Categoría *</label>
-                  <select
-                    id="toy-form-category"
-                    required
-                    value={categoryId}
-                    onChange={(e) => setCategoryId(e.target.value)}
-                    className="w-full px-4 py-2 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-sm font-medium text-slate-800 dark:text-slate-100 focus:outline-orange-500"
-                  >
-                    {categories.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Descripción Detallada *</label>
-                <textarea
-                  id="toy-form-description"
-                  required
-                  rows={2}
-                  placeholder="Detalles sobre piezas, edad, materiales y características..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-4 py-2 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-sm font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-orange-500"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Código SKU</label>
-                  <input
-                    type="text"
-                    placeholder="TOY-1234"
-                    value={sku}
-                    onChange={(e) => setSku(e.target.value)}
-                    className="w-full px-4 py-2 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-sm font-mono font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-orange-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Stock Disponible *</label>
-                  <input
-                    type="number"
-                    min="0"
-                    required
-                    value={stock}
-                    onChange={(e) => setStock(Number(e.target.value))}
-                    className="w-full px-4 py-2 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-sm font-medium text-slate-800 dark:text-slate-100 focus:outline-orange-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Edad Mínima Recomendada</label>
-                  <input
-                    type="number"
-                    min="0"
-                    placeholder="3"
-                    value={minAge}
-                    onChange={(e) => setMinAge(Number(e.target.value))}
-                    className="w-full px-4 py-2 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-sm font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-orange-500"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">URL de la Imagen</label>
-                <input
-                  type="url"
-                  placeholder="https://images.unsplash.com/..."
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  className="w-full px-4 py-2 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-sm font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-orange-500"
-                />
-              </div>
-
-              {/* Price, Tax, and Discount Section (Automated Calculations) */}
-              <div className="bg-[#FFFBEB] dark:bg-slate-800/80 p-4 sm:p-5 rounded-2xl border border-yellow-300 dark:border-slate-700 space-y-4">
-                <div className="flex items-center gap-2 text-slate-900 dark:text-white font-black text-sm">
-                  <Calculator className="w-4 h-4 text-orange-500 dark:text-orange-400" />
-                  <span>Configuración Fiscal & Descuentos (Fórmula MVC)</span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {/* Base Price */}
+                {/* General Info */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Precio Base (COP) *</label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-bold">$</span>
-                      <input
-                        id="toy-form-baseprice"
-                        type="number"
-                        step="1000"
-                        min="0"
-                        placeholder="Ej. 95000"
-                        required
-                        value={basePrice}
-                        onChange={(e) => setBasePrice(Number(e.target.value) || 0)}
-                        className="w-full pl-8 pr-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-yellow-300 dark:border-slate-700 text-sm font-bold text-slate-800 dark:text-slate-100 focus:outline-orange-500"
-                      />
-                    </div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Nombre del Juguete *</label>
+                    <input
+                      id="toy-form-name"
+                      type="text"
+                      required
+                      placeholder="Ej. Castillo Legendario LEGO"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full px-3.5 py-2 rounded-xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-orange-500"
+                    />
                   </div>
 
-                  {/* Tax Preset & Rate */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Tipo de Impuesto *</label>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Categoría *</label>
                     <select
-                      value={taxRate}
-                      onChange={(e) => {
-                        const rate = Number(e.target.value);
-                        const match = TAX_PRESETS.find((p) => p.rate === rate);
-                        if (match) handleTaxPresetChange(match);
-                        else setTaxRate(rate);
-                      }}
-                      className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-yellow-300 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-100 focus:outline-orange-500"
+                      id="toy-form-category"
+                      required
+                      value={categoryId}
+                      onChange={(e) => setCategoryId(e.target.value)}
+                      className="w-full px-3.5 py-2 rounded-xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 focus:outline-orange-500"
                     >
-                      {TAX_PRESETS.map((p) => (
-                        <option key={p.label} value={p.rate}>
-                          {p.label}
+                      {categories.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
                         </option>
                       ))}
                     </select>
                   </div>
+                </div>
 
-                  {/* Discount */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Descripción Detallada *</label>
+                  <textarea
+                    id="toy-form-description"
+                    required
+                    rows={2}
+                    placeholder="Detalles sobre piezas, edad, materiales y características..."
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-orange-500 resize-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                      Descuento ({discountType === 'percentage' ? '% Porcentaje' : '$ COP Fijo'})
-                    </label>
-                    <div className="flex gap-1.5">
-                      <input
-                        type="number"
-                        step={discountType === 'percentage' ? '1' : '1000'}
-                        min="0"
-                        placeholder={discountType === 'percentage' ? 'Ej. 15' : 'Ej. 20000'}
-                        value={discountValue}
-                        onChange={(e) => setDiscountValue(Number(e.target.value) || 0)}
-                        className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-yellow-300 dark:border-slate-700 text-sm font-bold text-slate-800 dark:text-slate-100 focus:outline-orange-500"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setDiscountType(discountType === 'percentage' ? 'fixed' : 'percentage')}
-                        className="px-3 py-1 bg-yellow-200 dark:bg-slate-700 hover:bg-yellow-300 dark:hover:bg-slate-600 rounded-xl text-xs font-black text-orange-950 dark:text-orange-200 whitespace-nowrap cursor-pointer"
-                        title="Cambiar entre porcentaje (%) o valor en pesos (COP)"
-                      >
-                        {discountType === 'percentage' ? '%' : 'COP'}
-                      </button>
-                    </div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Código SKU</label>
+                    <input
+                      type="text"
+                      placeholder="TOY-1234"
+                      value={sku}
+                      onChange={(e) => setSku(e.target.value)}
+                      className="w-full px-3.5 py-2 rounded-xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-xs sm:text-sm font-mono font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-orange-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Stock Disponible *</label>
+                    <input
+                      type="number"
+                      min="0"
+                      required
+                      value={stock}
+                      onChange={(e) => setStock(Number(e.target.value))}
+                      className="w-full px-3.5 py-2 rounded-xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 focus:outline-orange-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Edad Mínima Recomendada</label>
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="3"
+                      value={minAge}
+                      onChange={(e) => setMinAge(Number(e.target.value))}
+                      className="w-full px-3.5 py-2 rounded-xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-orange-500"
+                    />
                   </div>
                 </div>
 
-                {/* Real-time calculated Result Box */}
-                <div className="bg-slate-900 dark:bg-slate-950 text-white p-4 rounded-2xl shadow-sm border border-slate-800 dark:border-slate-800">
-                  <div className="text-xs text-orange-300 font-bold mb-1">
-                    Cálculo Automático en Vivo (Moneda COP):
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">URL de la Imagen</label>
+                  <input
+                    type="url"
+                    placeholder="https://images.unsplash.com/..."
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl bg-[#FFFBEB] dark:bg-slate-800 border border-yellow-300 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-orange-500"
+                  />
+                </div>
+
+                {/* Price, Tax, and Discount Section (Automated Calculations) */}
+                <div className="bg-[#FFFBEB] dark:bg-slate-800/80 p-3.5 sm:p-4 rounded-2xl border border-yellow-300 dark:border-slate-700 space-y-3">
+                  <div className="flex items-center gap-2 text-slate-900 dark:text-white font-black text-xs sm:text-sm">
+                    <Calculator className="w-4 h-4 text-orange-500 dark:text-orange-400" />
+                    <span>Configuración Fiscal & Descuentos (Fórmula MVC)</span>
                   </div>
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="text-xs font-mono text-slate-300">
-                      Base: <span className="font-bold text-white">{ToyModel.formatCurrency(livePriceBreakdown.basePrice)}</span> + 
-                      Impuesto ({livePriceBreakdown.taxRate}%): <span className="font-bold text-indigo-300">+{ToyModel.formatCurrency(livePriceBreakdown.taxAmount)}</span> - 
-                      Descuento: <span className="font-bold text-orange-300">-{ToyModel.formatCurrency(livePriceBreakdown.discountAmount)}</span>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {/* Base Price */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Precio Base (COP) *</label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-bold text-xs">$</span>
+                        <input
+                          id="toy-form-baseprice"
+                          type="number"
+                          step="1000"
+                          min="0"
+                          placeholder="Ej. 95000"
+                          required
+                          value={basePrice}
+                          onChange={(e) => setBasePrice(Number(e.target.value) || 0)}
+                          className="w-full pl-7 pr-2.5 py-1.5 sm:py-2 rounded-xl bg-white dark:bg-slate-900 border border-yellow-300 dark:border-slate-700 text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 focus:outline-orange-500"
+                        />
+                      </div>
                     </div>
 
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-xs uppercase font-bold text-amber-300 tracking-wider">Precio Final:</span>
-                      <span className="text-2xl font-black text-emerald-400 font-display">
-                        {ToyModel.formatCurrency(livePriceBreakdown.finalPrice)}
-                      </span>
+                    {/* Tax Preset & Rate */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Tipo de Impuesto *</label>
+                      <select
+                        value={taxRate}
+                        onChange={(e) => {
+                          const rate = Number(e.target.value);
+                          const match = TAX_PRESETS.find((p) => p.rate === rate);
+                          if (match) handleTaxPresetChange(match);
+                          else setTaxRate(rate);
+                        }}
+                        className="w-full px-2.5 py-1.5 sm:py-2 rounded-xl bg-white dark:bg-slate-900 border border-yellow-300 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-100 focus:outline-orange-500"
+                      >
+                        {TAX_PRESETS.map((p) => (
+                          <option key={p.label} value={p.rate}>
+                            {p.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Discount */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                        Descuento ({discountType === 'percentage' ? '% Porcentaje' : '$ COP Fijo'})
+                      </label>
+                      <div className="flex gap-1.5">
+                        <input
+                          type="number"
+                          step={discountType === 'percentage' ? '1' : '1000'}
+                          min="0"
+                          placeholder={discountType === 'percentage' ? 'Ej. 15' : 'Ej. 20000'}
+                          value={discountValue}
+                          onChange={(e) => setDiscountValue(Number(e.target.value) || 0)}
+                          className="w-full px-2.5 py-1.5 sm:py-2 rounded-xl bg-white dark:bg-slate-900 border border-yellow-300 dark:border-slate-700 text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 focus:outline-orange-500"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setDiscountType(discountType === 'percentage' ? 'fixed' : 'percentage')}
+                          className="px-2.5 py-1 bg-yellow-200 dark:bg-slate-700 hover:bg-yellow-300 dark:hover:bg-slate-600 rounded-xl text-xs font-black text-orange-950 dark:text-orange-200 whitespace-nowrap cursor-pointer"
+                          title="Cambiar entre porcentaje (%) o valor en pesos (COP)"
+                        >
+                          {discountType === 'percentage' ? '%' : 'COP'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Real-time calculated Result Box */}
+                  <div className="bg-slate-900 dark:bg-slate-950 text-white p-3.5 rounded-xl shadow-xs border border-slate-800">
+                    <div className="text-[11px] text-orange-300 font-bold mb-1">
+                      Cálculo Automático en Vivo (Moneda COP):
+                    </div>
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="text-xs font-mono text-slate-300">
+                        Base: <span className="font-bold text-white">{ToyModel.formatCurrency(livePriceBreakdown.basePrice)}</span> + 
+                        Impuesto ({livePriceBreakdown.taxRate}%): <span className="font-bold text-indigo-300">+{ToyModel.formatCurrency(livePriceBreakdown.taxAmount)}</span> - 
+                        Descuento: <span className="font-bold text-orange-300">-{ToyModel.formatCurrency(livePriceBreakdown.discountAmount)}</span>
+                      </div>
+
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-[11px] uppercase font-bold text-amber-300 tracking-wider">Precio Final:</span>
+                        <span className="text-xl sm:text-2xl font-black text-emerald-400 font-display">
+                          {ToyModel.formatCurrency(livePriceBreakdown.finalPrice)}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Form Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+              {/* Form Buttons (Fixed at bottom) */}
+              <div className="shrink-0 px-5 sm:px-6 py-3.5 bg-slate-50/90 dark:bg-slate-800/90 border-t border-yellow-200 dark:border-slate-800 flex items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-5 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
+                  className="px-4 sm:px-5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition-colors"
                 >
                   Cancelar
                 </button>
@@ -602,7 +612,7 @@ export const ToyManagementView: React.FC<ToyManagementViewProps> = ({
                   id="toy-form-submit"
                   type="submit"
                   disabled={isSaving}
-                  className="px-6 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black shadow-[0_4px_0_0_rgba(16,185,129,1)] active:translate-y-1 active:shadow-none transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-5 sm:px-6 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black shadow-[0_3px_0_0_rgba(16,185,129,1)] active:translate-y-0.5 active:shadow-none transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {isSaving ? (
                     <span>Guardando...</span>
