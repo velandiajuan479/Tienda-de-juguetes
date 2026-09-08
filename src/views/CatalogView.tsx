@@ -274,18 +274,6 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                       )}
                     </div>
 
-                    {/* Discount Badge */}
-                    {hasDiscount && (
-                       <div className="absolute top-3 right-3 bg-orange-500 text-white text-[11px] font-black px-3 py-1 rounded-full shadow-md flex items-center gap-1 animate-pulse">
-                         <Percent className="w-3 h-3" />
-                         <span>
-                           {toy.discountType === 'percentage'
-                             ? `-${toy.discountValue}%`
-                             : `-${ToyModel.formatCurrency(toy.discountValue)}`}
-                         </span>
-                       </div>
-                     )}
-
                     {/* SKU & Stock preview */}
                     <div className="absolute bottom-3 left-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-2.5 py-0.5 rounded-lg text-[10px] font-mono font-bold text-slate-700 dark:text-slate-300 shadow-xs border dark:border-slate-800">
                       {toy.sku}
