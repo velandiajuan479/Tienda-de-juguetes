@@ -463,7 +463,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                           ) : (
                             <>
                               <ShoppingBag className="w-4 h-4" />
-                              <span>Comprar</span>
+                              <span>Añadir</span>
                             </>
                           )}
                         </button>

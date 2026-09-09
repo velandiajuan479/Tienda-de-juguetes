@@ -8,6 +8,11 @@ html {
   max-width: 100vw;
   width: 100%;
   -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
@@ -16,6 +21,32 @@ body {
   width: 100%;
   min-height: 100%;
   background-color: #FFFBEB;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Firefox Mobile & Touch device interaction normalization */
+button,
+input,
+select,
+textarea,
+a {
+  touch-action: manipulation;
+}
+
+button::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+
+/* Firefox number input spin buttons */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 html.dark body,
@@ -28,6 +59,7 @@ html.dark {
   max-width: 100vw;
   width: 100%;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 @media print {
