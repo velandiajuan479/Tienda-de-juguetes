@@ -617,7 +617,7 @@ export const ToyManagementView: React.FC<ToyManagementViewProps> = ({
                         <input
                           id="toy-form-baseprice"
                           type="number"
-                          step="1000"
+                          step="any"
                           min="0"
                           placeholder="Ej. 95000"
                           required
@@ -657,7 +657,7 @@ export const ToyManagementView: React.FC<ToyManagementViewProps> = ({
                       <div className="flex gap-1.5">
                         <input
                           type="number"
-                          step={discountType === 'percentage' ? '1' : '1000'}
+                          step="any"
                           min="0"
                           placeholder={discountType === 'percentage' ? 'Ej. 15' : 'Ej. 20000'}
                           value={discountValue}
