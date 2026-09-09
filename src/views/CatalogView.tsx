@@ -47,12 +47,30 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
 
   const role: UserRole = currentUser?.role || 'cliente';
   const canManageToys = UserModel.can(role, 'manage_toys');
+  // Solo el admin y los empleados pueden ver los productos sin existencias
+  const canViewOutOfStock = currentUser?.role === 'admin' || currentUser?.role === 'empleado';
 
-  // Filter and sort toys
+  // Cantidad de productos sin existencias en el inventario general
+  const outOfStockCount = useMemo(() => {
+    return toys.filter((t) => (t.stock === undefined || t.stock <= 0)).length;
+  }, [toys]);
+
+  // Juguetes visibles según rol: oculta sin existencias para clientes y usuarios no registrados
+  const visibleToys = useMemo(() => {
+    return toys.filter((toy) => {
+      const currentStock = toy.stock ?? 0;
+      if (!canViewOutOfStock && currentStock <= 0) {
+        return false;
+      }
+      return true;
+    });
+  }, [toys, canViewOutOfStock]);
+
+  // Filter and sort visible toys
   const filteredToys = useMemo(() => {
     const selectedCatObj = categories.find((c) => c.id === selectedCategory);
 
-    return toys
+    return visibleToys
       .filter((toy) => {
         const matchesSearch =
           toy.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -78,7 +96,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
         if (sortBy === 'name') return a.name.localeCompare(b.name);
         return (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0);
       });
-  }, [toys, categories, searchQuery, selectedCategory, sortBy]);
+  }, [visibleToys, categories, searchQuery, selectedCategory, sortBy]);
 
 
   const handleAdd = (toy: Toy) => {
@@ -176,10 +194,10 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                 : 'bg-yellow-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-yellow-100 dark:hover:bg-slate-700 border border-yellow-200 dark:border-slate-700'
             }`}
           >
-            Todas ({toys.length})
+            Todas ({visibleToys.length})
           </button>
           {categories.map((cat) => {
-            const count = toys.filter(
+            const count = visibleToys.filter(
               (t) =>
                 t.categoryId === cat.id ||
                 (Boolean(t.categoryName) && Boolean(cat.name) && t.categoryName.trim().toLowerCase() === cat.name.trim().toLowerCase())
@@ -210,6 +228,28 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
           })}
         </div>
       </div>
+
+      {/* Staff Notice: Out-of-Stock Items (Visible only to Admin & Empleados) */}
+      {canViewOutOfStock && outOfStockCount > 0 && (
+        <div className="mb-6 p-4 rounded-3xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-950 dark:text-amber-200 shadow-xs animate-in fade-in">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="p-2 rounded-2xl bg-amber-500 text-white shrink-0 shadow-xs">
+              <AlertCircle className="w-4 h-4" />
+            </div>
+            <div>
+              <p className="font-black text-amber-950 dark:text-amber-100 text-sm font-display">
+                Control de Inventario ({currentUser?.role === 'admin' ? 'Administrador' : 'Empleado'})
+              </p>
+              <p className="text-amber-800 dark:text-amber-300 mt-0.5 leading-relaxed">
+                Hay <strong>{outOfStockCount} {outOfStockCount === 1 ? 'producto sin existencias' : 'productos sin existencias'}</strong>. Están ocultos automáticamente para clientes y visitantes no registrados hasta que añadas más stock.
+              </p>
+            </div>
+          </div>
+          <span className="self-start sm:self-center px-3 py-1 rounded-full bg-amber-200/80 dark:bg-amber-900/80 text-amber-900 dark:text-amber-200 font-black text-[11px] border border-amber-300 dark:border-amber-700 whitespace-nowrap">
+            {outOfStockCount} {outOfStockCount === 1 ? 'oculto al público' : 'ocultos al público'}
+          </span>
+        </div>
+      )}
 
       {/* Toys Grid */}
       {filteredToys.length === 0 ? (
@@ -272,6 +312,13 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                           +{toy.minAge} años
                         </span>
                       )}
+                      {/* Indicador de Últimas unidades (< 3 unidades en stock) */}
+                      {toy.stock > 0 && toy.stock < 3 && (
+                        <span className="px-2.5 py-1 rounded-full bg-amber-500 text-white text-[10px] font-black uppercase tracking-wider flex items-center gap-1 shadow-md animate-pulse">
+                          <AlertCircle className="w-3 h-3" />
+                          <span>Últimas unidades</span>
+                        </span>
+                      )}
                     </div>
 
                     {/* SKU & Stock preview */}
@@ -280,16 +327,34 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                     </div>
 
                     <div className="absolute bottom-3 right-3">
-                      {toy.stock > 0 ? (
+                      {toy.stock > 0 && toy.stock < 3 ? (
+                        <span className="px-2.5 py-0.5 rounded-lg bg-amber-500 text-white text-[10px] font-black shadow-xs flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3" />
+                          <span>Últimas {toy.stock} {toy.stock === 1 ? 'unidad' : 'unidades'}</span>
+                        </span>
+                      ) : toy.stock >= 3 ? (
                         <span className="px-2.5 py-0.5 rounded-lg bg-emerald-500 text-white text-[10px] font-black shadow-xs">
                           Stock: {toy.stock}
                         </span>
                       ) : (
                         <span className="px-2.5 py-0.5 rounded-lg bg-rose-500 text-white text-[10px] font-black shadow-xs">
-                          Agotado
+                          Sin existencias
                         </span>
                       )}
                     </div>
+
+                    {/* Overlay para productos sin existencias visible solo para personal (Admin / Empleado) */}
+                    {toy.stock <= 0 && (
+                      <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[1.5px] flex flex-col items-center justify-center p-3 text-center pointer-events-none">
+                        <span className="px-3 py-1 rounded-full bg-rose-600 text-white text-xs font-black shadow-md flex items-center gap-1.5 mb-1 border border-white/20">
+                          <AlertCircle className="w-3.5 h-3.5" />
+                          <span>Sin existencias</span>
+                        </span>
+                        <span className="text-[10px] font-bold text-amber-200 bg-black/60 px-2 py-0.5 rounded-md">
+                          Visible solo para Admin y Empleados
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Card Title & Desc */}
@@ -345,7 +410,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                       </div>
                     </div>
 
-                    {/* Action Buttons with 3D tactile emerald button */}
+                    {/* Action Buttons with 3D tactile emerald button or restock button for staff */}
                     <div className="flex items-center gap-1.5 shrink-0 ml-auto">
                       {canManageToys && onEditToy && (
                         <button
@@ -358,30 +423,51 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                         </button>
                       )}
 
-                      <button
-                        id={`add-to-cart-${toy.id}`}
-                        disabled={toy.stock <= 0}
-                        onClick={() => handleAdd(toy)}
-                        className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl text-xs font-black transition-all cursor-pointer ${
-                          toy.stock <= 0
-                            ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
-                            : isAdded
-                            ? 'bg-emerald-600 text-white'
-                            : 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-[0_4px_0_0_rgba(16,185,129,1)] active:translate-y-1 active:shadow-none'
-                        }`}
-                      >
-                        {isAdded ? (
-                          <>
-                            <Check className="w-4 h-4" />
-                            <span>¡Añadido!</span>
-                          </>
+                      {toy.stock <= 0 ? (
+                        canManageToys && onEditToy ? (
+                          <button
+                            id={`add-stock-btn-${toy.id}`}
+                            type="button"
+                            onClick={() => onEditToy(toy)}
+                            className="flex items-center gap-1.5 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl text-xs font-black bg-amber-500 hover:bg-amber-600 text-white shadow-[0_4px_0_0_rgba(217,119,6,1)] active:translate-y-1 active:shadow-none transition-all cursor-pointer"
+                            title="Añadir más stock en gestión"
+                          >
+                            <Plus className="w-4 h-4" />
+                            <span>Añadir Stock</span>
+                          </button>
                         ) : (
-                          <>
+                          <button
+                            disabled
+                            className="flex items-center gap-1.5 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl text-xs font-black bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed"
+                          >
                             <ShoppingBag className="w-4 h-4" />
-                            <span>Comprar</span>
-                          </>
-                        )}
-                      </button>
+                            <span>Agotado</span>
+                          </button>
+                        )
+                      ) : (
+                        <button
+                          id={`add-to-cart-${toy.id}`}
+                          disabled={toy.stock <= 0}
+                          onClick={() => handleAdd(toy)}
+                          className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl text-xs font-black transition-all cursor-pointer ${
+                            isAdded
+                              ? 'bg-emerald-600 text-white'
+                              : 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-[0_4px_0_0_rgba(16,185,129,1)] active:translate-y-1 active:shadow-none'
+                          }`}
+                        >
+                          {isAdded ? (
+                            <>
+                              <Check className="w-4 h-4" />
+                              <span>¡Añadido!</span>
+                            </>
+                          ) : (
+                            <>
+                              <ShoppingBag className="w-4 h-4" />
+                              <span>Comprar</span>
+                            </>
+                          )}
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -413,6 +499,21 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                   <span>SKU: {selectedToyDetail.sku}</span>
                   <span>Edad: +{selectedToyDetail.minAge} años</span>
                 </div>
+
+                {/* Stock Badges in Detail Modal */}
+                {selectedToyDetail.stock > 0 && selectedToyDetail.stock < 3 && (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-100 dark:bg-amber-950/80 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-800 text-xs font-black mb-2 animate-pulse">
+                    <AlertCircle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+                    <span>¡Últimas unidades! Quedan solo {selectedToyDetail.stock} disponibles.</span>
+                  </div>
+                )}
+
+                {selectedToyDetail.stock <= 0 && (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-rose-100 dark:bg-rose-950/80 text-rose-900 dark:text-rose-200 border border-rose-300 dark:border-rose-800 text-xs font-black mb-2">
+                    <AlertCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 shrink-0" />
+                    <span>Sin existencias (Agotado) — Visible solo para Admin y Empleados.</span>
+                  </div>
+                )}
 
                 <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-display">
                   {selectedToyDetail.name}
@@ -469,15 +570,38 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                 >
                   Cerrar
                 </button>
-                <button
-                  onClick={() => {
-                    handleAdd(selectedToyDetail);
-                    setSelectedToyDetail(null);
-                  }}
-                  className="px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black shadow-[0_4px_0_0_rgba(16,185,129,1)] active:translate-y-1 active:shadow-none transition-all cursor-pointer text-center"
-                >
-                  Agregar al Carrito
-                </button>
+                {selectedToyDetail.stock <= 0 ? (
+                  canManageToys && onEditToy ? (
+                    <button
+                      onClick={() => {
+                        const t = selectedToyDetail;
+                        setSelectedToyDetail(null);
+                        onEditToy(t);
+                      }}
+                      className="px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-black shadow-[0_4px_0_0_rgba(217,119,6,1)] active:translate-y-1 active:shadow-none transition-all cursor-pointer text-center flex items-center justify-center gap-1.5"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Añadir Stock (Gestión)</span>
+                    </button>
+                  ) : (
+                    <button
+                      disabled
+                      className="px-5 py-2.5 rounded-2xl bg-slate-200 dark:bg-slate-800 text-slate-400 text-xs font-black cursor-not-allowed text-center"
+                    >
+                      Sin Existencias
+                    </button>
+                  )
+                ) : (
+                  <button
+                    onClick={() => {
+                      handleAdd(selectedToyDetail);
+                      setSelectedToyDetail(null);
+                    }}
+                    className="px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black shadow-[0_4px_0_0_rgba(16,185,129,1)] active:translate-y-1 active:shadow-none transition-all cursor-pointer text-center"
+                  >
+                    Agregar al Carrito
+                  </button>
+                )}
               </div>
             </div>
           </div>
