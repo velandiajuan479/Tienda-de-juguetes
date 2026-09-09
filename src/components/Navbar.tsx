@@ -177,16 +177,21 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </button>
 
-            {/* User Role Badge Display */}
+            {/* User Role Status Display (Indicador de solo lectura de tu estado) */}
             {currentUser && (
               <div 
-                onClick={onOpenProfile}
-                className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-orange-600/90 dark:bg-slate-800 border border-orange-400/40 dark:border-slate-700 text-xs font-bold cursor-pointer hover:bg-orange-600 dark:hover:bg-slate-700 transition-colors shadow-xs"
-                title="Haz clic para ver o gestionar tu perfil y rol"
+                id="user-status-indicator"
+                className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-orange-600/90 dark:bg-slate-800 border border-orange-400/40 dark:border-slate-700 text-xs font-bold select-none cursor-default shadow-xs"
+                title={`Tu estado actual en el sistema: ${roleBadge.label} (Sesión activa)`}
               >
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+                </span>
                 {role === 'admin' && <ShieldCheck className="w-4 h-4 text-amber-300" />}
                 {role === 'empleado' && <Briefcase className="w-4 h-4 text-sky-200" />}
                 {role === 'cliente' && <UserCheck className="w-4 h-4 text-emerald-300" />}
+                <span className="text-[10px] text-orange-200 dark:text-slate-400 font-bold uppercase tracking-wider">Estado:</span>
                 <span className="capitalize text-white font-black">{roleBadge.label}</span>
               </div>
             )}
@@ -259,17 +264,28 @@ export const Navbar: React.FC<NavbarProps> = ({
         {mobileMenuOpen && (
           <div className="lg:hidden py-4 border-t border-orange-400/40 dark:border-slate-800 space-y-2 animate-in fade-in slide-in-from-top-2 duration-150">
             {currentUser ? (
-              <div 
-                onClick={() => { onOpenProfile(); setMobileMenuOpen(false); }}
-                className="p-3 bg-orange-600 dark:bg-slate-800 rounded-2xl flex items-center justify-between cursor-pointer mb-2 border border-transparent dark:border-slate-700 hover:bg-orange-700 dark:hover:bg-slate-700 transition-colors"
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <UserIcon className="w-4 h-4 text-orange-200 dark:text-amber-300 shrink-0" />
+              <div className="p-3 bg-orange-600 dark:bg-slate-800 rounded-2xl flex items-center justify-between mb-2 border border-transparent dark:border-slate-700">
+                <button 
+                  type="button"
+                  onClick={() => { onOpenProfile(); setMobileMenuOpen(false); }}
+                  className="flex items-center gap-2 min-w-0 hover:opacity-90 transition-opacity text-left cursor-pointer"
+                  title="Abrir Mi Perfil (Datos personales, Rol y Seguridad)"
+                >
+                  <div className="w-6 h-6 rounded-full bg-white text-orange-600 flex items-center justify-center font-black text-[10px] shrink-0">
+                    {currentUser.displayName?.substring(0, 2).toUpperCase() || 'US'}
+                  </div>
                   <span className="text-xs font-bold text-white truncate">{currentUser.displayName}</span>
+                  <span className="text-[10px] text-orange-200 dark:text-amber-300 underline ml-1 font-semibold">Ver perfil</span>
+                </button>
+                {/* Indicador de estado de solo lectura */}
+                <div 
+                  className="flex items-center gap-1.5 text-xs font-black bg-white/20 dark:bg-slate-700 text-white dark:text-amber-300 px-2.5 py-1 rounded-full shrink-0 ml-2 select-none cursor-default"
+                  title={`Estado: ${roleBadge.label}`}
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span className="text-[10px] text-orange-200 dark:text-slate-400 uppercase font-bold">Estado:</span>
+                  <span>{roleBadge.label}</span>
                 </div>
-                <span className="text-xs font-black bg-white dark:bg-slate-700 text-orange-600 dark:text-amber-300 px-2.5 py-0.5 rounded-full shrink-0 ml-2">
-                  {roleBadge.label}
-                </span>
               </div>
             ) : (
               <button
