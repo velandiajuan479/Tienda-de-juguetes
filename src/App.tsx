@@ -74,6 +74,8 @@ export default function App() {
   // Modals and Drawers
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [authInitialTab, setAuthInitialTab] = useState<'login' | 'register'>('login');
+  const [returnToCartAfterAuth, setReturnToCartAfterAuth] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [editingToyItem, setEditingToyItem] = useState<Toy | null>(null);
@@ -296,7 +298,9 @@ export default function App() {
           setSelectedInvoice(invoice);
           refreshAllData();
         }}
-        onOpenAuth={() => {
+        onOpenAuth={(tab?: 'login' | 'register') => {
+          setAuthInitialTab(tab || 'login');
+          setReturnToCartAfterAuth(true);
           setIsCartOpen(false);
           setIsAuthOpen(true);
         }}
@@ -315,11 +319,23 @@ export default function App() {
       {/* Auth Modal */}
       <AuthModal
         isOpen={isAuthOpen}
-        onClose={() => setIsAuthOpen(false)}
+        initialTab={authInitialTab}
+        onClose={() => {
+          setIsAuthOpen(false);
+          if (returnToCartAfterAuth) {
+            setIsCartOpen(true);
+            setReturnToCartAfterAuth(false);
+          }
+        }}
         onAuthSuccess={(profile) => {
           setCurrentUser(profile);
           showToast(`¡Bienvenido/a, ${profile.displayName}!`);
           refreshAllData();
+          setIsAuthOpen(false);
+          if (returnToCartAfterAuth) {
+            setIsCartOpen(true);
+            setReturnToCartAfterAuth(false);
+          }
         }}
       />
 

@@ -18,7 +18,9 @@ import {
   AlertCircle,
   Lock,
   ExternalLink,
-  Edit3
+  Edit3,
+  UserPlus,
+  LogIn
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { CartItem, PaymentMethod, UserProfile, Invoice } from '../types';
@@ -35,7 +37,7 @@ interface CartDrawerProps {
   onClearCart: () => void;
   currentUser: UserProfile | null;
   onInvoiceCreated: (invoice: Invoice) => void;
-  onOpenAuth: () => void;
+  onOpenAuth: (tab?: 'login' | 'register') => void;
   onOpenProfile?: () => void;
 }
 
@@ -59,15 +61,32 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   onOpenProfile,
 }) => {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
-  const [customerAddress, setCustomerAddress] = useState(currentUser?.address || 'Calle 123 # 45-67');
-  const [notes, setNotes] = useState('Factura generada en tienda');
+  
+  // Guest Personal Data State (for unregistered customers)
+  const [guestName, setGuestName] = useState('');
+  const [guestEmail, setGuestEmail] = useState('');
+  const [guestDocument, setGuestDocument] = useState('');
+  const [guestPhone, setGuestPhone] = useState('');
+  
+  // Delivery, payment & notes state
+  const [customerAddress, setCustomerAddress] = useState(currentUser?.address || '');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(currentUser?.defaultPaymentMethod || 'tarjeta');
+  const [notes, setNotes] = useState('');
+
+  // Fallback inputs for logged-in users who may lack document or phone in their profile
+  const [userDocInput, setUserDocInput] = useState(currentUser?.document || '');
+  const [userPhoneInput, setUserPhoneInput] = useState(currentUser?.phone || '');
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Synchronize address with currentUser profile when opened
+  // Synchronize with currentUser profile when opened or changed
   React.useEffect(() => {
-    if (currentUser?.address) {
-      setCustomerAddress(currentUser.address);
+    if (currentUser) {
+      if (currentUser.address) setCustomerAddress(currentUser.address);
+      if (currentUser.document) setUserDocInput(currentUser.document);
+      if (currentUser.phone) setUserPhoneInput(currentUser.phone);
+      if (currentUser.defaultPaymentMethod) setPaymentMethod(currentUser.defaultPaymentMethod);
     }
   }, [currentUser, isOpen]);
 
@@ -78,8 +97,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
   if (!isOpen) return null;
 
-  const userPaymentMethod: PaymentMethod = currentUser?.defaultPaymentMethod || 'tarjeta';
-  const paymentInfo = PAYMENT_METHOD_INFO[userPaymentMethod] || PAYMENT_METHOD_INFO.tarjeta;
+  const paymentInfo = PAYMENT_METHOD_INFO[paymentMethod] || PAYMENT_METHOD_INFO.tarjeta;
 
   const handleGenerateInvoice = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,22 +108,68 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
       return;
     }
 
+    let finalName = '';
+    let finalEmail = '';
+    let finalDoc = '';
+    let finalPhone = '';
+    const finalAddress = customerAddress.trim();
+
+    if (!currentUser) {
+      // Unregistered guest user validation - All personal data is mandatory before purchase
+      finalName = guestName.trim();
+      finalEmail = guestEmail.trim().toLowerCase();
+      finalDoc = guestDocument.trim();
+      finalPhone = guestPhone.trim();
+
+      if (!finalName || finalName.length < 2) {
+        setErrorMessage('Por favor ingresa tu Nombre Completo o Razón Social.');
+        return;
+      }
+      if (!finalDoc || finalDoc.length < 4) {
+        setErrorMessage('Por favor ingresa tu Cédula, NIT o documento de identidad para la factura.');
+        return;
+      }
+      if (!finalEmail || !finalEmail.includes('@') || !finalEmail.includes('.')) {
+        setErrorMessage('Por favor ingresa un Correo Electrónico válido para enviar tu factura.');
+        return;
+      }
+      if (!finalPhone || finalPhone.length < 7) {
+        setErrorMessage('Por favor ingresa un Teléfono Móvil de contacto para coordinar la entrega.');
+        return;
+      }
+      if (!finalAddress || finalAddress.length < 5) {
+        setErrorMessage('Por favor ingresa tu Dirección completa de entrega y facturación.');
+        return;
+      }
+    } else {
+      // Registered user
+      finalName = currentUser.displayName || 'Cliente ToyStore';
+      finalEmail = currentUser.email;
+      finalDoc = (currentUser.document || userDocInput).trim();
+      finalPhone = (currentUser.phone || userPhoneInput).trim();
+
+      if (!finalDoc || finalDoc.length < 4) {
+        setErrorMessage('Por favor ingresa tu número de cédula o NIT para emitir la factura legal.');
+        return;
+      }
+      if (!finalAddress || finalAddress.length < 5) {
+        setErrorMessage('Por favor ingresa la dirección de entrega para tu pedido.');
+        return;
+      }
+    }
+
     setIsSubmitting(true);
 
     try {
-      const finalName = currentUser?.displayName || 'Cliente ToyStore';
-      const finalEmail = currentUser?.email || 'cliente@toystore.com';
-      const finalDoc = currentUser?.document || '1094829104';
-      const finalPhone = currentUser?.phone || '';
-      const finalPayment = userPaymentMethod;
-      const finalAddress = customerAddress.trim() || currentUser?.address || 'Dirección no especificada';
-
       const activeUser: UserProfile = currentUser || {
-        id: 'guest_user',
-        uid: 'guest_user',
+        id: 'guest_' + Math.random().toString(36).substring(2, 9),
+        uid: 'guest_' + Math.random().toString(36).substring(2, 9),
         email: finalEmail,
         displayName: finalName,
         role: 'cliente',
+        document: finalDoc,
+        phone: finalPhone,
+        address: finalAddress,
         createdAt: new Date().toISOString(),
       };
 
@@ -116,8 +180,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
         customerDocument: finalDoc,
         customerPhone: finalPhone,
         customerAddress: finalAddress,
-        paymentMethod: finalPayment,
-        notes,
+        paymentMethod,
+        notes: notes.trim() || (currentUser ? 'Factura cliente registrado' : 'Factura cliente invitado'),
         currentUser: activeUser,
       });
 
@@ -208,6 +272,46 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
             ) : !isCheckingOut ? (
               /* Normal Cart Items View */
               <div className="space-y-3 sm:space-y-4">
+                {/* Notice for unregistered guests */}
+                {!currentUser && (
+                  <div className="p-3.5 sm:p-4 rounded-2xl bg-amber-500/10 dark:bg-amber-950/30 border border-amber-300/80 dark:border-amber-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-start gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+                        <User className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <h4 className="text-xs font-black text-slate-900 dark:text-white">¿Aún no te has registrado?</h4>
+                          <span className="text-[10px] font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/50 px-1.5 py-0.2 rounded-md">
+                            Aviso
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-0.5">
+                          Para comprar necesitarás ingresar tus datos personales o registrarte antes de emitir la factura.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => onOpenAuth('register')}
+                        className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1 px-3 py-1.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+                      >
+                        <UserPlus className="w-3 h-3" />
+                        <span>Registrarme</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onOpenAuth('login')}
+                        className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1 px-3 py-1.5 rounded-xl border border-yellow-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-yellow-50 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                      >
+                        <LogIn className="w-3 h-3" />
+                        <span>Iniciar Sesión</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex items-center justify-between text-xs font-black text-slate-500 dark:text-slate-400 pb-2 border-b border-yellow-100 dark:border-slate-800">
                   <span>Productos en la orden</span>
                   <button onClick={onClearCart} className="text-rose-500 dark:text-rose-400 hover:underline font-bold cursor-pointer">
@@ -290,148 +394,366 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
             ) : (
               /* Checkout / Invoice Billing Form */
               <form id="checkout-invoice-form" onSubmit={handleGenerateInvoice} className="space-y-4">
-                <div className="p-4 bg-orange-500/10 dark:bg-orange-950/30 rounded-2xl border border-orange-200 dark:border-orange-800/50 flex items-start gap-2.5">
-                  <FileText className="w-4 h-4 text-orange-600 dark:text-orange-400 shrink-0 mt-0.5" />
-                  <p className="text-xs text-orange-950 dark:text-orange-200 font-medium leading-relaxed">
-                    La factura fiscal se emitirá con tus datos oficiales registrados. En este paso únicamente puedes modificar la <strong className="text-orange-700 dark:text-orange-300">dirección de entrega</strong> si lo requieres.
-                  </p>
-                </div>
+                {!currentUser ? (
+                  /* CASO INVITADO: NO REGISTRADO */
+                  <>
+                    {/* Tarjeta Informativa de Registro o Datos Personales */}
+                    <div className="p-4 rounded-3xl bg-amber-50 dark:bg-amber-950/20 border-2 border-amber-300 dark:border-amber-800/70 space-y-3 shadow-xs">
+                      <div className="flex items-start gap-3">
+                        <div className="w-9 h-9 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+                          <ShieldCheck className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white font-display">
+                              Datos Personales Requeridos
+                            </h4>
+                            <span className="text-[10px] font-black uppercase text-amber-800 dark:text-amber-300 bg-amber-200/70 dark:bg-amber-900/60 px-2 py-0.5 rounded-full">
+                              Sin Registro
+                            </span>
+                          </div>
+                          <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
+                            Para comprar sin cuenta, debes ingresar tus datos personales para la factura fiscal y despacho. O si prefieres, <strong>regístrate en segundos</strong> para guardar tu historial.
+                          </p>
+                        </div>
+                      </div>
 
-                {/* Datos del Usuario - Solo Lectura (Provenientes del Perfil) */}
-                <div className="p-4 rounded-3xl bg-amber-50/50 dark:bg-slate-800/80 border border-yellow-200/90 dark:border-slate-700 space-y-3.5 shadow-xs">
-                  <div className="flex items-center justify-between pb-2.5 border-b border-yellow-200/80 dark:border-slate-700">
-                    <div className="flex items-center gap-1.5 text-xs font-black text-slate-800 dark:text-slate-200">
-                      <Lock className="w-3.5 h-3.5 text-orange-500" />
-                      <span>Datos del Titular (Sección de Usuario)</span>
-                    </div>
-                    {onOpenProfile && (
-                      <button
-                        type="button"
-                        onClick={onOpenProfile}
-                        className="text-[11px] font-bold text-orange-600 dark:text-orange-400 hover:text-orange-700 flex items-center gap-1 hover:underline cursor-pointer"
-                        title="Modificar datos en tu perfil de usuario"
-                      >
-                        <span>Editar en Perfil</span>
-                        <ExternalLink className="w-3 h-3" />
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Nombre y Cédula */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                    <div>
-                      <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                        Nombre / Razón Social
-                      </span>
-                      <div className="flex items-center gap-1.5 mt-1 font-extrabold text-slate-900 dark:text-white truncate">
-                        <User className="w-3.5 h-3.5 text-orange-400 shrink-0" />
-                        <span className="truncate">{currentUser?.displayName || 'Cliente ToyStore'}</span>
+                      <div className="p-2.5 rounded-2xl bg-white dark:bg-slate-800 border border-amber-200 dark:border-amber-900/50 flex flex-col sm:flex-row items-center justify-between gap-2.5">
+                        <div className="text-[11px] text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                          <Sparkles className="w-3.5 h-3.5 text-orange-500 shrink-0" />
+                          <span>¿Prefieres tener tu cuenta guardada?</span>
+                        </div>
+                        <div className="flex items-center gap-2 w-full sm:w-auto">
+                          <button
+                            type="button"
+                            onClick={() => onOpenAuth('register')}
+                            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-black shadow-xs transition-all cursor-pointer"
+                          >
+                            <UserPlus className="w-3.5 h-3.5" />
+                            <span>Registrarme</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => onOpenAuth('login')}
+                            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                          >
+                            <LogIn className="w-3.5 h-3.5" />
+                            <span>Iniciar Sesión</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
 
-                    <div>
-                      <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                        Cédula / NIT
-                      </span>
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <FileText className="w-3.5 h-3.5 text-orange-400 shrink-0" />
-                        {currentUser?.document ? (
-                          <span className="font-mono font-bold text-slate-900 dark:text-white">
-                            C.C. {currentUser.document}
-                          </span>
-                        ) : (
-                          <div className="flex items-center gap-1">
-                            <span className="text-amber-700 dark:text-amber-400 text-[11px] font-bold italic">
-                              Sin cédula
-                            </span>
-                            {onOpenProfile && (
-                              <button
-                                type="button"
-                                onClick={onOpenProfile}
-                                className="text-[10px] text-orange-600 dark:text-orange-400 underline font-bold"
-                              >
-                                (Completar)
-                              </button>
-                            )}
+                    {/* Formulario de Datos Personales del Invitado */}
+                    <div className="p-4 sm:p-5 rounded-3xl bg-white dark:bg-slate-800 border-2 border-orange-400 dark:border-orange-500 shadow-sm space-y-4">
+                      <div className="flex items-center justify-between pb-2 border-b border-yellow-200/80 dark:border-slate-700">
+                        <div className="flex items-center gap-2 text-xs font-black text-slate-900 dark:text-white font-display">
+                          <User className="w-4 h-4 text-orange-500" />
+                          <span>Tus Datos Personales y de Facturación</span>
+                        </div>
+                        <span className="text-[10px] font-black text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-slate-700 px-2 py-0.5 rounded-md">
+                          Obligatorios *
+                        </span>
+                      </div>
+
+                      {/* Nombre y Cédula */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label htmlFor="guest-name" className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                            Nombre Completo o Razón Social *
+                          </label>
+                          <div className="relative">
+                            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <input
+                              id="guest-name"
+                              type="text"
+                              required
+                              placeholder="Ej. Juan Carlos Pérez"
+                              value={guestName}
+                              onChange={(e) => setGuestName(e.target.value)}
+                              className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-yellow-50/50 dark:bg-slate-900 border border-yellow-300 dark:border-slate-700 text-xs font-semibold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-orange-500"
+                            />
                           </div>
+                        </div>
+
+                        <div>
+                          <label htmlFor="guest-document" className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                            Cédula / Documento / NIT *
+                          </label>
+                          <div className="relative">
+                            <FileText className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <input
+                              id="guest-document"
+                              type="text"
+                              required
+                              placeholder="Ej. 1094829104"
+                              value={guestDocument}
+                              onChange={(e) => setGuestDocument(e.target.value)}
+                              className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-yellow-50/50 dark:bg-slate-900 border border-yellow-300 dark:border-slate-700 text-xs font-semibold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-orange-500"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Correo y Teléfono */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label htmlFor="guest-email" className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                            Correo Electrónico *
+                          </label>
+                          <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <input
+                              id="guest-email"
+                              type="email"
+                              required
+                              placeholder="tucorreo@ejemplo.com"
+                              value={guestEmail}
+                              onChange={(e) => setGuestEmail(e.target.value)}
+                              className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-yellow-50/50 dark:bg-slate-900 border border-yellow-300 dark:border-slate-700 text-xs font-semibold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-orange-500"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label htmlFor="guest-phone" className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                            Teléfono Móvil / WhatsApp *
+                          </label>
+                          <div className="relative">
+                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <input
+                              id="guest-phone"
+                              type="tel"
+                              required
+                              placeholder="Ej. 310 123 4567"
+                              value={guestPhone}
+                              onChange={(e) => setGuestPhone(e.target.value)}
+                              className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-yellow-50/50 dark:bg-slate-900 border border-yellow-300 dark:border-slate-700 text-xs font-semibold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-orange-500"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Dirección de Entrega */}
+                      <div>
+                        <label htmlFor="guest-address" className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                          Dirección Completa de Entrega y Facturación *
+                        </label>
+                        <div className="relative">
+                          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                          <input
+                            id="guest-address"
+                            type="text"
+                            required
+                            placeholder="Ej. Carrera 15 # 85-32, Apto 401, Bogotá"
+                            value={customerAddress}
+                            onChange={(e) => setCustomerAddress(e.target.value)}
+                            className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-yellow-50/50 dark:bg-slate-900 border border-yellow-300 dark:border-slate-700 text-xs font-semibold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-orange-500"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Forma de Pago */}
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                          Forma de Pago *
+                        </label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {(['tarjeta', 'efectivo', 'transferencia', 'digital'] as PaymentMethod[]).map((method) => {
+                            const info = PAYMENT_METHOD_INFO[method];
+                            const isSelected = paymentMethod === method;
+                            return (
+                              <button
+                                key={method}
+                                type="button"
+                                onClick={() => setPaymentMethod(method)}
+                                className={`p-2.5 rounded-xl border text-left flex items-center gap-2 transition-all cursor-pointer ${
+                                  isSelected
+                                    ? 'border-orange-500 bg-orange-50 dark:bg-orange-950/40 text-orange-950 dark:text-orange-200 ring-2 ring-orange-500/20'
+                                    : 'border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-900/60 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                }`}
+                              >
+                                <div className={`p-1 rounded-lg ${isSelected ? 'bg-orange-500 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'}`}>
+                                  {React.createElement(info.icon, { className: 'w-3.5 h-3.5' })}
+                                </div>
+                                <span className="text-[11px] font-black line-clamp-1">{info.label}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Observaciones */}
+                      <div>
+                        <label htmlFor="guest-notes" className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                          Observaciones o Instrucciones de entrega (Opcional)
+                        </label>
+                        <input
+                          id="guest-notes"
+                          type="text"
+                          placeholder="Ej. Dejar en recepción o portería, timbre 401"
+                          value={notes}
+                          onChange={(e) => setNotes(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl bg-yellow-50/50 dark:bg-slate-900 border border-yellow-300 dark:border-slate-700 text-xs font-medium text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-orange-500"
+                        />
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  /* CASO USUARIO REGISTRADO */
+                  <>
+                    <div className="p-4 bg-orange-500/10 dark:bg-orange-950/30 rounded-2xl border border-orange-200 dark:border-orange-800/50 flex items-start gap-2.5">
+                      <FileText className="w-4 h-4 text-orange-600 dark:text-orange-400 shrink-0 mt-0.5" />
+                      <p className="text-xs text-orange-950 dark:text-orange-200 font-medium leading-relaxed">
+                        La factura fiscal se emitirá con tus datos oficiales registrados. En este paso únicamente puedes verificar tus datos y modificar la <strong className="text-orange-700 dark:text-orange-300">dirección de entrega</strong> si lo requieres.
+                      </p>
+                    </div>
+
+                    {/* Datos del Usuario - Solo Lectura (Provenientes del Perfil) */}
+                    <div className="p-4 rounded-3xl bg-amber-50/50 dark:bg-slate-800/80 border border-yellow-200/90 dark:border-slate-700 space-y-3.5 shadow-xs">
+                      <div className="flex items-center justify-between pb-2.5 border-b border-yellow-200/80 dark:border-slate-700">
+                        <div className="flex items-center gap-1.5 text-xs font-black text-slate-800 dark:text-slate-200">
+                          <Lock className="w-3.5 h-3.5 text-orange-500" />
+                          <span>Datos del Titular (Sección de Usuario)</span>
+                        </div>
+                        {onOpenProfile && (
+                          <button
+                            type="button"
+                            onClick={onOpenProfile}
+                            className="text-[11px] font-bold text-orange-600 dark:text-orange-400 hover:text-orange-700 flex items-center gap-1 hover:underline cursor-pointer"
+                            title="Modificar datos en tu perfil de usuario"
+                          >
+                            <span>Editar en Perfil</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </button>
                         )}
                       </div>
-                    </div>
-                  </div>
 
-                  {/* Correo y Teléfono */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-2.5 border-t border-yellow-200/60 dark:border-slate-700/60">
-                    <div>
-                      <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                        Correo de Factura
-                      </span>
-                      <div className="flex items-center gap-1.5 mt-1 text-slate-700 dark:text-slate-300">
-                        <Mail className="w-3.5 h-3.5 text-orange-400 shrink-0" />
-                        <span className="truncate text-[11px] font-medium">{currentUser?.email || 'cliente@toystore.com'}</span>
+                      {/* Nombre y Cédula */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <div>
+                          <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                            Nombre / Razón Social
+                          </span>
+                          <div className="flex items-center gap-1.5 mt-1 font-extrabold text-slate-900 dark:text-white truncate">
+                            <User className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+                            <span className="truncate">{currentUser.displayName || 'Cliente ToyStore'}</span>
+                          </div>
+                        </div>
+
+                        <div>
+                          <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                            Cédula / NIT
+                          </span>
+                          <div className="flex items-center gap-1.5 mt-1">
+                            <FileText className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+                            {currentUser.document ? (
+                              <span className="font-mono font-bold text-slate-900 dark:text-white">
+                                C.C. {currentUser.document}
+                              </span>
+                            ) : (
+                              <div className="flex items-center gap-1">
+                                <span className="text-amber-700 dark:text-amber-400 text-[11px] font-bold italic">
+                                  Sin cédula
+                                </span>
+                                {onOpenProfile && (
+                                  <button
+                                    type="button"
+                                    onClick={onOpenProfile}
+                                    className="text-[10px] text-orange-600 dark:text-orange-400 underline font-bold"
+                                  >
+                                    (Completar)
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Correo y Teléfono */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-2.5 border-t border-yellow-200/60 dark:border-slate-700/60">
+                        <div>
+                          <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                            Correo de Factura
+                          </span>
+                          <div className="flex items-center gap-1.5 mt-1 text-slate-700 dark:text-slate-300">
+                            <Mail className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+                            <span className="truncate text-[11px] font-medium">{currentUser.email || 'cliente@toystore.com'}</span>
+                          </div>
+                        </div>
+
+                        <div>
+                          <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                            Teléfono Móvil
+                          </span>
+                          <div className="flex items-center gap-1.5 mt-1 text-slate-700 dark:text-slate-300">
+                            <Phone className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+                            <span className="truncate text-[11px] font-medium">{currentUser.phone || 'No registrado'}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Forma de Pago vinculada */}
+                      <div className="pt-2.5 border-t border-yellow-200/60 dark:border-slate-700/60">
+                        <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                          Forma de Pago para este Pedido
+                        </span>
+                        <div className="grid grid-cols-2 gap-2">
+                          {(['tarjeta', 'efectivo', 'transferencia', 'digital'] as PaymentMethod[]).map((method) => {
+                            const info = PAYMENT_METHOD_INFO[method];
+                            const isSelected = paymentMethod === method;
+                            return (
+                              <button
+                                key={method}
+                                type="button"
+                                onClick={() => setPaymentMethod(method)}
+                                className={`p-2 rounded-xl border text-left flex items-center gap-2 transition-all cursor-pointer ${
+                                  isSelected
+                                    ? 'border-orange-500 bg-orange-50 dark:bg-orange-950/40 text-orange-950 dark:text-orange-200 ring-2 ring-orange-500/20'
+                                    : 'border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-900/60 text-slate-700 dark:text-slate-300'
+                                }`}
+                              >
+                                <div className={`p-1 rounded-lg ${isSelected ? 'bg-orange-500 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'}`}>
+                                  {React.createElement(info.icon, { className: 'w-3 h-3' })}
+                                </div>
+                                <span className="text-[10px] font-black line-clamp-1">{info.label}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
                     </div>
 
-                    <div>
-                      <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                        Teléfono Móvil
-                      </span>
-                      <div className="flex items-center gap-1.5 mt-1 text-slate-700 dark:text-slate-300">
-                        <Phone className="w-3.5 h-3.5 text-orange-400 shrink-0" />
-                        <span className="truncate text-[11px] font-medium">{currentUser?.phone || 'No registrado'}</span>
+                    {/* ÚNICO CAMPO EDITABLE: DIRECCIÓN DE ENTREGA / FACTURACIÓN */}
+                    <div className="p-4 rounded-3xl bg-white dark:bg-slate-800 border-2 border-orange-400 dark:border-orange-500 shadow-sm space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label htmlFor="cart-customer-address" className="block text-xs font-black text-slate-900 dark:text-white">
+                          Dirección de Entrega / Facturación *
+                        </label>
+                        <span className="text-[10px] font-black text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/80 px-2.5 py-0.5 rounded-full border border-emerald-300 dark:border-emerald-800">
+                          Editable en este paso
+                        </span>
                       </div>
-                    </div>
-                  </div>
 
-                  {/* Forma de Pago vinculada */}
-                  <div className="pt-2.5 border-t border-yellow-200/60 dark:border-slate-700/60 flex items-center justify-between text-xs">
-                    <div>
-                      <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                        Forma de Pago vinculada
-                      </span>
-                      <div className="flex items-center gap-2 mt-1 text-slate-900 dark:text-white font-black">
-                        {React.createElement(paymentInfo.icon, { className: 'w-4 h-4 text-orange-500 shrink-0' })}
-                        <span>{paymentInfo.label}</span>
+                      <div className="relative">
+                        <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-500" />
+                        <input
+                          id="cart-customer-address"
+                          type="text"
+                          required
+                          placeholder="Ej. Calle 123 # 45-67, Apto 302, Bogotá"
+                          value={customerAddress}
+                          onChange={(e) => setCustomerAddress(e.target.value)}
+                          className="w-full pl-10 pr-3.5 py-3 rounded-2xl bg-yellow-50/50 dark:bg-slate-900 border border-yellow-300 dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-hidden focus:ring-2 focus:ring-orange-500 transition-all"
+                        />
                       </div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                        Puedes ajustar tu dirección de entrega específicamente para este pedido antes de generar la factura. Los demás datos se administran en tu perfil de usuario.
+                      </p>
                     </div>
-                    {onOpenProfile && (
-                      <button
-                        type="button"
-                        onClick={onOpenProfile}
-                        className="text-[11px] font-bold text-orange-600 dark:text-orange-400 hover:underline cursor-pointer"
-                      >
-                        Cambiar en perfil
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* ÚNICO CAMPO EDITABLE: DIRECCIÓN DE ENTREGA / FACTURACIÓN */}
-                <div className="p-4 rounded-3xl bg-white dark:bg-slate-800 border-2 border-orange-400 dark:border-orange-500 shadow-sm space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label htmlFor="cart-customer-address" className="block text-xs font-black text-slate-900 dark:text-white">
-                      Dirección de Entrega / Facturación *
-                    </label>
-                    <span className="text-[10px] font-black text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/80 px-2.5 py-0.5 rounded-full border border-emerald-300 dark:border-emerald-800">
-                      Editable en este paso
-                    </span>
-                  </div>
-
-                  <div className="relative">
-                    <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-500" />
-                    <input
-                      id="cart-customer-address"
-                      type="text"
-                      required
-                      placeholder="Ej. Calle 123 # 45-67, Apto 302, Bogotá"
-                      value={customerAddress}
-                      onChange={(e) => setCustomerAddress(e.target.value)}
-                      className="w-full pl-10 pr-3.5 py-3 rounded-2xl bg-yellow-50/50 dark:bg-slate-900 border border-yellow-300 dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-hidden focus:ring-2 focus:ring-orange-500 transition-all"
-                    />
-                  </div>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                    Puedes ajustar tu dirección de entrega específicamente para este pedido antes de generar la factura. Los demás datos se administran en tu perfil de usuario.
-                  </p>
-                </div>
+                  </>
+                )}
               </form>
             )}
           </div>
