@@ -49,18 +49,18 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   return (
-    <header className="sticky top-0 z-40 bg-orange-500 dark:bg-slate-900 text-white shadow-lg border-b border-orange-600/40 dark:border-slate-800 transition-colors duration-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+    <header className="sticky top-0 z-40 bg-orange-500 dark:bg-slate-900 text-white shadow-lg border-b border-orange-600/40 dark:border-slate-800 transition-colors duration-200 w-full overflow-x-clip">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 sm:h-20 gap-1.5 sm:gap-4 w-full">
           
           {/* Logo & Brand (Vibrant Theme Rotated Badge) */}
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => setCurrentView('catalog')}>
-            <div className="w-11 h-11 sm:w-12 sm:h-12 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center rotate-3 shadow-md hover:rotate-6 transition-transform border dark:border-slate-700">
-              <span className="text-2xl font-black text-orange-500 font-display">🧸</span>
+          <div className="flex items-center gap-2 sm:gap-3 cursor-pointer shrink-0" onClick={() => setCurrentView('catalog')}>
+            <div className="w-9 h-9 sm:w-12 sm:h-12 bg-white dark:bg-slate-800 rounded-xl sm:rounded-2xl flex items-center justify-center rotate-3 shadow-md hover:rotate-6 transition-transform border dark:border-slate-700 shrink-0">
+              <span className="text-xl sm:text-2xl font-black text-orange-500 font-display">🧸</span>
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xl sm:text-2xl font-black tracking-tight text-white font-display">
+              <div className="flex items-center gap-1 sm:gap-2">
+                <span className="text-lg sm:text-2xl font-black tracking-tight text-white font-display">
                   ToyStore <span className="font-extrabold text-amber-200 dark:text-amber-400">Kids</span>
                 </span>
               </div>
@@ -160,20 +160,20 @@ export const Navbar: React.FC<NavbarProps> = ({
           </nav>
 
           {/* Right Action Controls */}
-          <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
             
             {/* Dark / Light Mode Toggle Button */}
             <button
               id="theme-toggle-button"
               onClick={onToggleDarkMode}
-              className="p-2.5 rounded-2xl bg-orange-600 dark:bg-slate-800 hover:bg-orange-700 dark:hover:bg-slate-700 text-amber-200 dark:text-amber-300 border border-orange-400/40 dark:border-slate-700 transition-all shadow-xs flex items-center justify-center cursor-pointer"
+              className="p-2 sm:p-2.5 rounded-xl sm:rounded-2xl bg-orange-600 dark:bg-slate-800 hover:bg-orange-700 dark:hover:bg-slate-700 text-amber-200 dark:text-amber-300 border border-orange-400/40 dark:border-slate-700 transition-all shadow-xs flex items-center justify-center cursor-pointer shrink-0"
               title={isDarkMode ? 'Cambiar a Modo Claro' : 'Cambiar a Modo Oscuro'}
               aria-label={isDarkMode ? 'Cambiar a Modo Claro' : 'Cambiar a Modo Oscuro'}
             >
               {isDarkMode ? (
-                <Sun className="w-5 h-5 text-amber-300" />
+                <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300" />
               ) : (
-                <Moon className="w-5 h-5 text-amber-100" />
+                <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-amber-100" />
               )}
             </button>
 
@@ -181,7 +181,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {currentUser && (
               <div 
                 id="user-status-indicator"
-                className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-orange-600/90 dark:bg-slate-800 border border-orange-400/40 dark:border-slate-700 text-xs font-bold select-none cursor-default shadow-xs"
+                className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-orange-600/90 dark:bg-slate-800 border border-orange-400/40 dark:border-slate-700 text-xs font-bold select-none cursor-default shadow-xs"
                 title={`Tu estado actual en el sistema: ${roleBadge.label} (Sesión activa)`}
               >
                 <span className="relative flex h-2 w-2">
@@ -200,12 +200,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               id="cart-drawer-toggle"
               onClick={onOpenCart}
-              className="relative p-2.5 rounded-2xl bg-orange-600 dark:bg-slate-800 hover:bg-orange-700 dark:hover:bg-slate-700 text-white border border-orange-400/40 dark:border-slate-700 transition-all shadow-xs cursor-pointer"
+              className="relative p-2 sm:p-2.5 rounded-xl sm:rounded-2xl bg-orange-600 dark:bg-slate-800 hover:bg-orange-700 dark:hover:bg-slate-700 text-white border border-orange-400/40 dark:border-slate-700 transition-all shadow-xs cursor-pointer shrink-0"
               title="Ver Carrito y Facturación"
             >
-              <ShoppingBag className="w-5 h-5" />
+              <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />
               {cartCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-emerald-400 text-slate-900 text-[11px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-md animate-bounce">
+                <span className="absolute -top-1.5 -right-1.5 bg-emerald-400 text-slate-900 text-[10px] sm:text-[11px] font-black w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center shadow-md animate-bounce">
                   {cartCount}
                 </span>
               )}
@@ -213,11 +213,11 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {/* Auth / Profile Button */}
             {currentUser ? (
-              <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="flex items-center gap-1 sm:gap-2 shrink-0">
                 <button
                   id="profile-button"
                   onClick={onOpenProfile}
-                  className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-2xl bg-white dark:bg-slate-800 text-orange-600 dark:text-amber-300 hover:bg-orange-50 dark:hover:bg-slate-700 border border-transparent dark:border-slate-700 font-black text-xs shadow-md transition-all cursor-pointer"
+                  className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-xl sm:rounded-2xl bg-white dark:bg-slate-800 text-orange-600 dark:text-amber-300 hover:bg-orange-50 dark:hover:bg-slate-700 border border-transparent dark:border-slate-700 font-black text-xs shadow-md transition-all cursor-pointer shrink-0"
                   title="Abrir Mi Perfil"
                 >
                   <div className="w-6 h-6 rounded-full bg-orange-500 text-white flex items-center justify-center font-black text-[10px] shrink-0">
@@ -231,7 +231,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   id="sign-out-button"
                   onClick={onSignOut}
-                  className="p-2 rounded-xl text-orange-100 dark:text-slate-400 hover:text-white hover:bg-orange-600 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  className="hidden sm:flex p-2 rounded-xl text-orange-100 dark:text-slate-400 hover:text-white hover:bg-orange-600 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
                   title="Cerrar sesión"
                   aria-label="Cerrar sesión"
                 >
@@ -242,7 +242,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 id="sign-in-button"
                 onClick={onOpenAuth}
-                className="flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-2xl bg-white dark:bg-slate-800 hover:bg-orange-50 dark:hover:bg-slate-700 text-orange-600 dark:text-amber-300 border border-transparent dark:border-slate-700 text-xs font-black transition-all shadow-md cursor-pointer shrink-0"
+                className="flex items-center gap-1.5 px-2.5 sm:px-4 py-2 rounded-xl sm:rounded-2xl bg-white dark:bg-slate-800 hover:bg-orange-50 dark:hover:bg-slate-700 text-orange-600 dark:text-amber-300 border border-transparent dark:border-slate-700 text-xs font-black transition-all shadow-md cursor-pointer shrink-0"
               >
                 <LogIn className="w-3.5 h-3.5 shrink-0" />
                 <span>Ingresar<span className="hidden sm:inline"> / Registro</span></span>
@@ -252,10 +252,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Mobile / Tablet Menu Toggle Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-2xl bg-orange-600 dark:bg-slate-800 text-white border border-transparent dark:border-slate-700 cursor-pointer shrink-0"
+              className="lg:hidden p-2 rounded-xl sm:rounded-2xl bg-orange-600 dark:bg-slate-800 text-white border border-transparent dark:border-slate-700 cursor-pointer shrink-0"
               aria-label="Abrir menú de navegación"
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileMenuOpen ? <X className="w-4 h-4 sm:w-5 sm:h-5" /> : <Menu className="w-4 h-4 sm:w-5 sm:h-5" />}
             </button>
           </div>
         </div>

@@ -198,7 +198,7 @@ export default function App() {
   const role: UserRole = currentUser?.role || 'cliente';
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FFFBEB] dark:bg-slate-950 text-slate-800 dark:text-slate-100 selection:bg-orange-500 selection:text-white font-sans transition-colors duration-200">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden flex flex-col bg-[#FFFBEB] dark:bg-slate-950 text-slate-800 dark:text-slate-100 selection:bg-orange-500 selection:text-white font-sans transition-colors duration-200">
       
       {/* Toast Notification with Vibrant Styling */}
       {toastMessage && (
@@ -225,7 +225,7 @@ export default function App() {
       />
 
       {/* Main View Router */}
-      <main className="flex-1">
+      <main className="flex-1 w-full max-w-full overflow-x-hidden">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center min-h-[50vh]">
             <div className="w-14 h-14 rounded-3xl bg-orange-500 shadow-lg shadow-orange-500/30 rotate-3 flex items-center justify-center text-white mb-4 animate-bounce">

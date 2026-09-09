@@ -106,7 +106,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 overflow-x-hidden">
       
       {/* Top Welcome & MVC Formula Explanation */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -184,7 +184,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
         </div>
 
         {/* Category Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1.5 -mx-1 px-1 sm:mx-0 sm:px-0 scrollbar-none">
+        <div className="w-full flex items-center gap-2 overflow-x-auto pb-1.5 scrollbar-none touch-pan-x">
           <button
             id="cat-pill-all"
             onClick={() => setSelectedCategory('all')}
@@ -272,7 +272,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 w-full">
           {filteredToys.map((toy) => {
             const breakdown = ToyModel.calculatePriceBreakdown(
               toy.basePrice,
@@ -287,7 +287,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
               <div
                 key={toy.id}
                 id={`toy-card-${toy.id}`}
-                className="group bg-white dark:bg-slate-900 rounded-[2rem] p-5 border border-yellow-200/90 dark:border-slate-800 hover:border-orange-300 dark:hover:border-orange-500 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+                className="group bg-white dark:bg-slate-900 rounded-[2rem] p-4 sm:p-5 border border-yellow-200/90 dark:border-slate-800 hover:border-orange-300 dark:hover:border-orange-500 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between w-full min-w-0 overflow-hidden"
               >
                 <div>
                   {/* Image Container with Vibrant Rounded Header */}
@@ -403,8 +403,8 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                       <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">
                         Precio Final
                       </span>
-                      <div className="flex items-baseline gap-1.5">
-                        <span className="text-lg sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 font-display">
+                      <div className="flex items-baseline gap-1.5 min-w-0">
+                        <span className="text-base sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 font-display truncate">
                           {ToyModel.formatCurrency(breakdown.finalPrice)}
                         </span>
                       </div>
