@@ -12,10 +12,13 @@ import {
   Ban, 
   AlertCircle,
   Clock,
-  Printer
+  Printer,
+  Trash2,
+  AlertTriangle
 } from 'lucide-react';
 import { Invoice, UserProfile, UserRole } from '../types';
 import { ToyModel } from '../models/ToyModel';
+import { UserModel } from '../models/UserModel';
 import { InvoiceController } from '../controllers/InvoiceController';
 import { generateInvoicePdf } from '../utils/generateInvoicePdf';
 
@@ -24,6 +27,7 @@ interface InvoicesListViewProps {
   currentUser: UserProfile | null;
   onSelectInvoice: (invoice: Invoice) => void;
   onRefreshInvoices: () => Promise<void>;
+  onInvoiceDeleted?: () => void;
 }
 
 export const InvoicesListView: React.FC<InvoicesListViewProps> = ({
@@ -31,12 +35,17 @@ export const InvoicesListView: React.FC<InvoicesListViewProps> = ({
   currentUser,
   onSelectInvoice,
   onRefreshInvoices,
+  onInvoiceDeleted,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [deletingInvoice, setDeletingInvoice] = useState<Invoice | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const role: UserRole = currentUser?.role || 'cliente';
   const isStaffOrAdmin = role === 'admin' || role === 'empleado';
+  const isAdmin = UserModel.can(role, 'delete_invoice');
 
   const filteredInvoices = useMemo(() => {
     return invoices.filter((inv) => {
@@ -60,6 +69,22 @@ export const InvoicesListView: React.FC<InvoicesListViewProps> = ({
     }
   };
 
+  const handleConfirmDelete = async () => {
+    if (!deletingInvoice || !isAdmin) return;
+    try {
+      setIsDeleting(true);
+      setDeleteError(null);
+      await InvoiceController.deleteInvoice(deletingInvoice.id, currentUser);
+      setDeletingInvoice(null);
+      await onRefreshInvoices();
+      onInvoiceDeleted?.();
+    } catch (err: any) {
+      setDeleteError(err?.message || 'Error al eliminar la factura');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
       
@@ -78,6 +103,12 @@ export const InvoicesListView: React.FC<InvoicesListViewProps> = ({
               ? 'Consulta, descarga en PDF y audita todas las transacciones emitidas en la tienda con desglose tributario en COP.'
               : 'Revisa y descarga tus facturas oficiales en formato PDF.'}
           </p>
+          {isAdmin && (
+            <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 text-xs font-bold border border-rose-200 dark:border-rose-900/50">
+              <Trash2 className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 shrink-0" />
+              <span>Privilegio de Administrador activo: Puedes borrar facturas permanentemente sin importar cliente, fecha ni estado.</span>
+            </div>
+          )}
         </div>
 
         {/* Total revenue badge for staff/admin */}
@@ -244,6 +275,21 @@ export const InvoicesListView: React.FC<InvoicesListViewProps> = ({
                             <Ban className="w-4 h-4" />
                           </button>
                         )}
+
+                        {isAdmin && (
+                          <button
+                            id={`delete-invoice-btn-${inv.id}`}
+                            onClick={() => {
+                              setDeleteError(null);
+                              setDeletingInvoice(inv);
+                            }}
+                            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-rose-600 dark:hover:text-white dark:hover:bg-rose-600 transition-colors cursor-pointer"
+                            title={`Eliminar factura permanentemente (${inv.invoiceNumber})`}
+                            aria-label={`Eliminar factura ${inv.invoiceNumber}`}
+                          >
+                            <Trash2 className="w-4 h-4 text-rose-500 hover:text-white" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -338,12 +384,130 @@ export const InvoicesListView: React.FC<InvoicesListViewProps> = ({
                       <Ban className="w-4 h-4" />
                     </button>
                   )}
+
+                  {isAdmin && (
+                    <button
+                      id={`delete-invoice-mobile-btn-${inv.id}`}
+                      onClick={() => {
+                        setDeleteError(null);
+                        setDeletingInvoice(inv);
+                      }}
+                      className="p-2 rounded-xl text-rose-500 hover:text-white hover:bg-rose-600 dark:hover:text-white dark:hover:bg-rose-600 transition-colors cursor-pointer"
+                      title={`Eliminar factura permanentemente (${inv.invoiceNumber})`}
+                      aria-label={`Eliminar factura ${inv.invoiceNumber}`}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               </div>
             ))
           )}
         </div>
       </div>
+
+      {/* Admin Delete Confirmation Modal */}
+      {deletingInvoice && (
+        <div 
+          id="delete-invoice-modal-overlay"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150"
+        >
+          <div 
+            id="delete-invoice-modal-card"
+            className="bg-white dark:bg-slate-900 max-w-lg w-full rounded-[2rem] p-6 shadow-2xl border border-rose-200 dark:border-rose-900/50 text-left relative overflow-hidden"
+          >
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+                <Trash2 className="w-6 h-6" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 text-[10px] font-black uppercase tracking-wider">
+                    Privilegio de Administrador
+                  </span>
+                </div>
+                <h3 className="text-xl font-black text-slate-900 dark:text-white font-display mt-1">
+                  ¿Eliminar factura {deletingInvoice.invoiceNumber}?
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                  Como administrador, puedes borrar esta factura sin importar el cliente, fecha de emisión ni estado. Esta acción borrará el registro de la base de datos permanentemente.
+                </p>
+              </div>
+            </div>
+
+            {/* Invoice Summary Box inside modal */}
+            <div className="mt-4 p-4 rounded-2xl bg-[#FFFBEB] dark:bg-slate-800/80 border border-yellow-200 dark:border-slate-700 text-xs space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">N° Factura:</span>
+                <span className="font-mono font-bold text-orange-950 dark:text-orange-300 bg-yellow-100 dark:bg-slate-700 px-2 py-0.5 rounded-lg text-xs">
+                  {deletingInvoice.invoiceNumber}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Cliente:</span>
+                <span className="font-bold text-slate-900 dark:text-white truncate max-w-[220px]">
+                  {deletingInvoice.customerName} ({deletingInvoice.customerDocument})
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Fecha:</span>
+                <span className="font-medium text-slate-700 dark:text-slate-300">
+                  {new Date(deletingInvoice.createdAt).toLocaleString('es-CO', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Total:</span>
+                <span className="font-black text-emerald-600 dark:text-emerald-400 font-display text-sm">
+                  {ToyModel.formatCurrency(deletingInvoice.grandTotal)}
+                </span>
+              </div>
+            </div>
+
+            {deleteError && (
+              <div className="mt-3 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-rose-700 dark:text-rose-300 text-xs font-semibold">
+                {deleteError}
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-yellow-100 dark:border-slate-800">
+              <button
+                id="cancel-delete-invoice-btn"
+                type="button"
+                disabled={isDeleting}
+                onClick={() => {
+                  setDeletingInvoice(null);
+                  setDeleteError(null);
+                }}
+                className="px-4 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                id="confirm-delete-invoice-btn"
+                type="button"
+                disabled={isDeleting}
+                onClick={handleConfirmDelete}
+                className="px-5 py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                {isDeleting ? (
+                  <span>Borrando factura...</span>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4" />
+                    <span>Sí, Eliminar Factura</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

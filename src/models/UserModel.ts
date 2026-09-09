@@ -23,7 +23,7 @@ export class UserModel {
   /**
    * Helper to check permissions based on user role
    */
-  static can(role: UserRole, action: 'manage_toys' | 'manage_categories' | 'manage_users' | 'create_invoice' | 'view_all_invoices'): boolean {
+  static can(role: UserRole, action: 'manage_toys' | 'manage_categories' | 'manage_users' | 'create_invoice' | 'view_all_invoices' | 'delete_invoice'): boolean {
     switch (action) {
       case 'manage_toys':
         // Empleado and Admin can manage toys
@@ -40,6 +40,9 @@ export class UserModel {
       case 'view_all_invoices':
         // Empleado and Admin can view all store invoices; Cliente only views their own
         return role === 'empleado' || role === 'admin';
+      case 'delete_invoice':
+        // Only Admin can delete invoices, regardless of customer, date, or status
+        return role === 'admin';
       default:
         return false;
     }

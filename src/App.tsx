@@ -272,6 +272,9 @@ export default function App() {
                 currentUser={currentUser}
                 onSelectInvoice={(inv) => setSelectedInvoice(inv)}
                 onRefreshInvoices={refreshAllData}
+                onInvoiceDeleted={() => {
+                  showToast('Factura eliminada permanentemente por el Administrador.');
+                }}
               />
             )}
 
@@ -313,7 +316,13 @@ export default function App() {
       {/* Invoice Detail Modal with PDF Download */}
       <InvoiceDetailModal
         invoice={selectedInvoice}
+        currentUser={currentUser}
         onClose={() => setSelectedInvoice(null)}
+        onDeleteInvoice={async (invoiceId) => {
+          await InvoiceController.deleteInvoice(invoiceId, currentUser);
+          await refreshAllData();
+          showToast('Factura eliminada permanentemente por el Administrador.');
+        }}
       />
 
       {/* Auth Modal */}

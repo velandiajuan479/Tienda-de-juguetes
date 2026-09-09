@@ -4,6 +4,7 @@ import {
   doc, 
   setDoc, 
   updateDoc, 
+  deleteDoc,
   query, 
   orderBy 
 } from 'firebase/firestore';
@@ -137,6 +138,27 @@ export class InvoiceController {
 
     const existing = await this.getCachedInvoices();
     const updated = existing.map((inv) => (inv.id === id ? { ...inv, status } : inv));
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
+  }
+
+  /**
+   * Permanently deletes an invoice from Firestore and local cache.
+   * Only administrators are authorized to perform this operation,
+   * regardless of the customer, issue date, or status.
+   */
+  static async deleteInvoice(id: string, currentUser?: UserProfile | null): Promise<void> {
+    if (currentUser && currentUser.role !== 'admin') {
+      throw new Error('Solo los administradores tienen permisos para eliminar facturas.');
+    }
+
+    try {
+      await deleteDoc(doc(db, COLLECTION_NAME, id));
+    } catch (err) {
+      console.warn('Firestore deleteInvoice fallback:', err);
+    }
+
+    const existing = await this.getCachedInvoices();
+    const updated = existing.filter((inv) => inv.id !== id);
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
   }
 

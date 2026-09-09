@@ -12,21 +12,33 @@ import {
   CreditCard, 
   Calendar,
   FileCheck,
-  Loader2
+  Loader2,
+  Trash2
 } from 'lucide-react';
-import { Invoice } from '../types';
+import { Invoice, UserProfile } from '../types';
 import { ToyModel } from '../models/ToyModel';
 import { generateInvoicePdf } from '../utils/generateInvoicePdf';
+import { InvoiceController } from '../controllers/InvoiceController';
 
 interface InvoiceDetailModalProps {
   invoice: Invoice | null;
+  currentUser?: UserProfile | null;
   onClose: () => void;
+  onDeleteInvoice?: (id: string) => Promise<void>;
 }
 
-export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice, onClose }) => {
+export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ 
+  invoice, 
+  currentUser,
+  onClose,
+  onDeleteInvoice
+}) => {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   if (!invoice) return null;
+
+  const isAdmin = currentUser?.role === 'admin';
 
   const handlePrint = () => {
     window.print();
@@ -40,6 +52,26 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
       console.error('Error generando PDF:', err);
     } finally {
       setTimeout(() => setIsGeneratingPdf(false), 400);
+    }
+  };
+
+  const handleDeleteFromModal = async () => {
+    if (!isAdmin) return;
+    const confirmMessage = `¿Estás seguro de eliminar permanentemente la factura ${invoice.invoiceNumber} de ${invoice.customerName}?\n\nComo administrador, esta acción borrará la factura de la base de datos sin importar el cliente o la fecha.`;
+    if (window.confirm(confirmMessage)) {
+      try {
+        setIsDeleting(true);
+        if (onDeleteInvoice) {
+          await onDeleteInvoice(invoice.id);
+        } else {
+          await InvoiceController.deleteInvoice(invoice.id, currentUser);
+        }
+        onClose();
+      } catch (err: any) {
+        alert(err?.message || 'Error al eliminar la factura');
+      } finally {
+        setIsDeleting(false);
+      }
     }
   };
 
@@ -92,6 +124,19 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({ invoice,
               <Printer className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Imprimir</span>
             </button>
+
+            {isAdmin && (
+              <button
+                id="btn-delete-invoice-modal"
+                onClick={handleDeleteFromModal}
+                disabled={isDeleting}
+                className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-2xl bg-rose-50 hover:bg-rose-600 dark:bg-rose-950/40 dark:hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white dark:hover:text-white border border-rose-200 dark:border-rose-900/50 text-xs font-black transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                title="Eliminar factura permanentemente de la base de datos (Solo Administrador)"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">{isDeleting ? 'Borrando...' : 'Eliminar'}</span>
+              </button>
+            )}
 
             <button
               onClick={onClose}
